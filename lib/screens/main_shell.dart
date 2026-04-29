@@ -37,10 +37,14 @@ class _MainShellState extends State<MainShell> {
             top: 0,
             left: 0,
             right: 0,
-            bottom: 88,
+            bottom: 120,
             child: Align(
               alignment: Alignment.bottomCenter,
-              
+              child: MiniPlayer(
+                      onOpenPlayer: () => Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const NowPlayingScreen()),
+                      ),
+                    ),
             ),
           ),
         ],
