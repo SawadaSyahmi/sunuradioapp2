@@ -38,7 +38,7 @@ class _MainShellState extends State<MainShell> {
             top: 0,
             left: 0,
             right: 0,
-            bottom: 82,
+            bottom: 92,
             child: Align(
               alignment: Alignment.bottomCenter,
               child: _index == 0
@@ -59,7 +59,7 @@ class _MainShellState extends State<MainShell> {
           child: Container(
             height: 68,
             decoration: BoxDecoration(
-              color: const Color(0xF0080610),
+              color: const Color(0xFF080610),
               borderRadius: BorderRadius.circular(28),
               border: Border.all(color: Colors.white.withOpacity(.08)),
             ),

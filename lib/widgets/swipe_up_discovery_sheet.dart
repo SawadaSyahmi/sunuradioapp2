@@ -12,7 +12,7 @@ class SwipeUpDiscoverySheet extends StatefulWidget {
 
 class _SwipeUpDiscoverySheetState extends State<SwipeUpDiscoverySheet> {
   final DraggableScrollableController _sheetController = DraggableScrollableController();
-  double _extent = .13;
+  double _extent = .115;
 
   @override
   void dispose() {
@@ -21,7 +21,7 @@ class _SwipeUpDiscoverySheetState extends State<SwipeUpDiscoverySheet> {
   }
 
   Future<void> _toggleSheet() async {
-    final target = _extent < .2 ? .48 : (_extent < .78 ? 1.0 : .13);
+    final target = _extent < .2 ? .48 : (_extent < .78 ? 1.0 : .115);
     await _sheetController.animateTo(
       target,
       duration: const Duration(milliseconds: 280),
@@ -40,17 +40,17 @@ class _SwipeUpDiscoverySheetState extends State<SwipeUpDiscoverySheet> {
       },
       child: DraggableScrollableSheet(
         controller: _sheetController,
-        initialChildSize: .13,
-        minChildSize: .13,
+        initialChildSize: .115,
+        minChildSize: .115,
         maxChildSize: 1.0,
         snap: true,
-        snapSizes: const [.13, .48, 1.0],
+        snapSizes: const [.115, .48, 1.0],
         expand: false,
         builder: (context, scrollController) {
           return Container(
             margin: const EdgeInsets.symmetric(horizontal: 18),
             decoration: BoxDecoration(
-              color: const Color(0xF2161026),
+              color: const Color(0xFF161026),
               borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
               border: Border.all(color: Colors.white.withOpacity(.08)),
               boxShadow: [
@@ -171,7 +171,7 @@ class _SwipeUpDiscoverySheetState extends State<SwipeUpDiscoverySheet> {
                         children: [
                           Expanded(
                             child: _InfoCard(
-                              height: 160,
+                              height: 188,
                               title: "Today's\nSchedule",
                               subtitle: '10:00 AM\nDesign Critiques\nSarah L.',
                               accent: AppColors.mint,
@@ -181,8 +181,8 @@ class _SwipeUpDiscoverySheetState extends State<SwipeUpDiscoverySheet> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: Container(
-                              height: 160,
-                              padding: const EdgeInsets.all(16),
+                              height: 188,
+                              padding: const EdgeInsets.all(14),
                               decoration: BoxDecoration(
                                 color: const Color(0xFF2B1848),
                                 borderRadius: BorderRadius.circular(24),
@@ -195,18 +195,18 @@ class _SwipeUpDiscoverySheetState extends State<SwipeUpDiscoverySheet> {
                                     "EDITOR'S PICK",
                                     style: TextStyle(color: Color(0xFFFFD85A), fontSize: 10, fontWeight: FontWeight.w900),
                                   ),
-                                  const SizedBox(height: 10),
+                                  const SizedBox(height: 8),
                                   Container(
-                                    height: 72,
+                                    height: 64,
                                     decoration: BoxDecoration(
                                       color: const Color(0xFFE2B04C),
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: const Center(child: Icon(Icons.mic_none_rounded, color: Colors.white, size: 30)),
                                   ),
-                                  const SizedBox(height: 10),
-                                  const Text('Mic Drop', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18)),
-                                  const Text('Spoken Word', style: TextStyle(color: AppColors.muted, fontSize: 12)),
+                                  const SizedBox(height: 8),
+                                  const Text('Mic Drop', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontWeight: FontWeight.w900, fontSize: 17)),
+                                  const Text('Spoken Word', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: AppColors.muted, fontSize: 11)),
                                 ],
                               ),
                             ),
