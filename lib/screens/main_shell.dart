@@ -33,20 +33,21 @@ class _MainShellState extends State<MainShell> {
       body: Stack(
         children: [
           IndexedStack(index: _index, children: _screens),
-          Positioned.fill(
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 120,
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: MiniPlayer(
-                      onOpenPlayer: () => Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const NowPlayingScreen()),
-                      ),
-                    ),
+          if (_index != 0)
+            Positioned.fill(
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 120,
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: MiniPlayer(
+                  onOpenPlayer: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const NowPlayingScreen()),
+                  ),
+                ),
+              ),
             ),
-          ),
         ],
       ),
       bottomNavigationBar: SafeArea(
