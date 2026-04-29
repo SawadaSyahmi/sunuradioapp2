@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../core/app_colors.dart';
 import '../widgets/mini_player.dart';
-import '../widgets/swipe_up_discovery_sheet.dart';
 import 'events_screen.dart';
 import 'home_screen.dart';
 import 'live_schedule_screen.dart';
@@ -38,16 +37,10 @@ class _MainShellState extends State<MainShell> {
             top: 0,
             left: 0,
             right: 0,
-            bottom: 120,
+            bottom: 88,
             child: Align(
               alignment: Alignment.bottomCenter,
-              child: _index == 0
-                  ? const SwipeUpDiscoverySheet()
-                  : MiniPlayer(
-                      onOpenPlayer: () => Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const NowPlayingScreen()),
-                      ),
-                    ),
+              
             ),
           ),
         ],
