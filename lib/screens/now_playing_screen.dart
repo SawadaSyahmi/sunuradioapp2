@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import '../core/app_colors.dart';
 import '../data/demo_data.dart';
 import '../widgets/gradient_background.dart';
-import '../widgets/live_badge.dart';
 import '../widgets/play_button.dart';
 import '../widgets/show_artwork.dart';
+import '../widgets/status_pill.dart';
+import 'show_detail_screen.dart';
 
 class NowPlayingScreen extends StatelessWidget {
   const NowPlayingScreen({super.key});
@@ -20,16 +21,21 @@ class NowPlayingScreen extends StatelessWidget {
         ),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(22, 16, 22, 20),
+            padding: const EdgeInsets.fromLTRB(20, 14, 20, 18),
             child: LayoutBuilder(
               builder: (context, constraints) {
-                final compact = constraints.maxHeight < 710;
+                final compact = constraints.maxHeight < 720;
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        const LiveBadge(label: 'LIVE NOW'),
+                        IconButton.filledTonal(
+                          onPressed: () => Navigator.pop(context),
+                          icon: const Icon(Icons.keyboard_arrow_down_rounded),
+                        ),
+                        const SizedBox(width: 8),
+                        const StatusPill(label: 'LIVE NOW', icon: Icons.graphic_eq_rounded),
                         const Spacer(),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -44,9 +50,16 @@ class NowPlayingScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    SizedBox(height: compact ? 16 : 25),
-                    Expanded(child: ShowArtwork()),
-                    SizedBox(height: compact ? 16 : 25),
+                    SizedBox(height: compact ? 16 : 24),
+                    Expanded(
+                      child: Center(
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxHeight: 390),
+                          child: const ShowArtwork(borderRadius: 38, icon: Icons.radio_rounded),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: compact ? 16 : 24),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
@@ -56,73 +69,95 @@ class NowPlayingScreen extends StatelessWidget {
                             children: [
                               Text(
                                 currentShow.title,
-                                style: const TextStyle(fontSize: 33, fontWeight: FontWeight.w900, letterSpacing: -.8, height: .98),
+                                style: const TextStyle(fontSize: 34, fontWeight: FontWeight.w900, letterSpacing: -.9, height: .98),
                               ),
-                              const SizedBox(height: 5),
-                              Text(currentShow.host, style: const TextStyle(color: Colors.white70, fontSize: 15, fontWeight: FontWeight.w700)),
+                              const SizedBox(height: 6),
+                              Text('with ${currentShow.host}', style: const TextStyle(color: Colors.white70, fontSize: 15, fontWeight: FontWeight.w800)),
                             ],
                           ),
                         ),
-                        IconButton.filled(
-                          onPressed: () {},
-                          style: IconButton.styleFrom(backgroundColor: Colors.white.withOpacity(.12), fixedSize: const Size(48, 48)),
+                        IconButton.filledTonal(
+                          onPressed: () => Navigator.of(context).push(
+                            MaterialPageRoute(builder: (_) => const ShowDetailScreen(show: currentShow)),
+                          ),
                           icon: const Icon(Icons.more_horiz_rounded),
                         ),
                       ],
                     ),
                     const SizedBox(height: 13),
-                    Row(
-                      children: currentShow.tags
-                          .map((tag) => Padding(
-                                padding: const EdgeInsets.only(right: 8),
-                                child: _ShowTag(label: tag),
-                              ))
-                          .toList(),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: currentShow.tags.map((tag) => _ShowTag(label: tag)).toList(),
                     ),
                     const SizedBox(height: 18),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(999),
-                      child: const LinearProgressIndicator(
-                        value: .78,
-                        minHeight: 5,
-                        backgroundColor: Colors.white24,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(.28),
+                        borderRadius: BorderRadius.circular(28),
+                        border: Border.all(color: Colors.white.withOpacity(.10)),
+                      ),
+                      child: Column(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(999),
+                            child: const LinearProgressIndicator(
+                              value: .78,
+                              minHeight: 5,
+                              backgroundColor: Colors.white24,
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          const Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('08:42', style: TextStyle(color: Colors.white60, fontSize: 12, fontWeight: FontWeight.w700)),
+                              Text('-01:18', style: TextStyle(color: Colors.white60, fontSize: 12, fontWeight: FontWeight.w700)),
+                            ],
+                          ),
+                          SizedBox(height: compact ? 12 : 18),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              _ControlButton(
+                                icon: Icons.skip_previous_rounded,
+                                onTap: () => _toast(context, 'Live radio cannot skip backward'),
+                              ),
+                              const SizedBox(width: 18),
+                              const PlayButton(size: 78),
+                              const SizedBox(width: 18),
+                              _ControlButton(
+                                icon: Icons.skip_next_rounded,
+                                onTap: () => _toast(context, 'Live radio cannot skip forward'),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    const Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('08:42', style: TextStyle(color: Colors.white60, fontSize: 12)),
-                        Text('-01:18', style: TextStyle(color: Colors.white60, fontSize: 12)),
-                      ],
-                    ),
-                    SizedBox(height: compact ? 10 : 18),
-                    const Center(child: PlayButton(size: 78)),
-                    SizedBox(height: compact ? 10 : 18),
+                    SizedBox(height: compact ? 12 : 16),
                     Container(
-                      padding: const EdgeInsets.all(18),
+                      padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(.42),
-                        borderRadius: BorderRadius.circular(28),
+                        color: Colors.black.withOpacity(.35),
+                        borderRadius: BorderRadius.circular(26),
                         border: Border.all(color: Colors.white.withOpacity(.08)),
                       ),
                       child: Row(
                         children: [
                           const Text('UP NEXT', style: TextStyle(color: AppColors.muted, fontSize: 11, fontWeight: FontWeight.w900)),
-                          const Spacer(),
-                          Text(schedule[2].time.split('–').first.trim(), style: const TextStyle(fontWeight: FontWeight.w800)),
-                          Flexible(child: Text('  ·  ${schedule[2].title}', overflow: TextOverflow.ellipsis, style: const TextStyle(color: AppColors.muted))),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              '${schedule[2].time.split('–').first.trim()} · ${schedule[2].title}',
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontWeight: FontWeight.w800),
+                            ),
+                          ),
                           const Icon(Icons.keyboard_arrow_up_rounded, color: AppColors.muted),
                         ],
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Center(
-                      child: TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text('Back to tabs', style: TextStyle(color: Colors.white54, fontSize: 12)),
                       ),
                     ),
                   ],
@@ -131,6 +166,35 @@ class NowPlayingScreen extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  void _toast(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+  }
+}
+
+class _ControlButton extends StatelessWidget {
+  const _ControlButton({required this.icon, required this.onTap});
+
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      customBorder: const CircleBorder(),
+      onTap: onTap,
+      child: Container(
+        width: 48,
+        height: 48,
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(.09),
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.white.withOpacity(.10)),
+        ),
+        child: Icon(icon, color: Colors.white, size: 26),
       ),
     );
   }

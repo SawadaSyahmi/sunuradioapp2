@@ -263,7 +263,7 @@ class _SwipeUpDiscoverySheetState extends State<SwipeUpDiscoverySheet> {
                                     ),
                                   ),
                                   OutlinedButton(
-                                    onPressed: () {},
+                                    onPressed: () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Reminder set for ${show.title}'))),
                                     child: const Text('Remind'),
                                   ),
                                 ],

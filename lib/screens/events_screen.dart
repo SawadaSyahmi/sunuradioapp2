@@ -4,6 +4,9 @@ import '../data/demo_data.dart';
 import '../models/radio_models.dart';
 import '../widgets/frosted_card.dart';
 import '../widgets/gradient_background.dart';
+import '../widgets/section_header.dart';
+import '../widgets/status_pill.dart';
+import 'event_detail_screen.dart';
 
 class EventsScreen extends StatelessWidget {
   const EventsScreen({super.key});
@@ -13,13 +16,29 @@ class EventsScreen extends StatelessWidget {
     return GradientBackground(
       child: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(18, 20, 18, 170),
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.fromLTRB(18, 20, 18, 184),
           children: [
-            const Text('Events', style: TextStyle(fontSize: 34, fontWeight: FontWeight.w900)),
+            const Text('Events', style: TextStyle(fontSize: 34, fontWeight: FontWeight.w900, letterSpacing: -.8)),
             const SizedBox(height: 6),
-            const Text('Discover campus events, RSVP, and set reminders.', style: TextStyle(color: AppColors.muted)),
+            const Text('Discover campus events, RSVP, and set reminders.', style: TextStyle(color: AppColors.muted, height: 1.35)),
+            const SizedBox(height: 22),
+            _FeaturedEvent(
+              event: events.first,
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => EventDetailScreen(event: events.first)),
+              ),
+            ),
             const SizedBox(height: 24),
-            for (final event in events) _EventCard(event: event),
+            const SectionHeader(title: 'Upcoming events', subtitle: 'Curated around music, podcasts, and campus life'),
+            const SizedBox(height: 12),
+            for (final event in events.skip(1))
+              _EventCard(
+                event: event,
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => EventDetailScreen(event: event)),
+                ),
+              ),
           ],
         ),
       ),
@@ -27,75 +46,143 @@ class EventsScreen extends StatelessWidget {
   }
 }
 
-class _EventCard extends StatelessWidget {
-  const _EventCard({required this.event});
+class _FeaturedEvent extends StatelessWidget {
+  const _FeaturedEvent({required this.event, required this.onTap});
 
   final CampusEvent event;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(34),
+      onTap: onTap,
+      child: Container(
+        height: 226,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        gradient: AppColors.orangeGradient,
+        borderRadius: BorderRadius.circular(34),
+        border: Border.all(color: Colors.white.withOpacity(.10)),
+        boxShadow: [BoxShadow(color: AppColors.orange.withOpacity(.22), blurRadius: 30, offset: const Offset(0, 16))],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              StatusPill(label: event.date.toUpperCase(), foregroundColor: AppColors.bg, backgroundColor: AppColors.mint),
+              const SizedBox(width: 8),
+              StatusPill(label: event.category.toUpperCase(), icon: Icons.local_activity_rounded),
+            ],
+          ),
+          const Spacer(),
+          Text(event.title, style: const TextStyle(fontSize: 33, fontWeight: FontWeight.w900, height: .94, letterSpacing: -.9)),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              const Icon(Icons.place_rounded, size: 17, color: Colors.white70),
+              const SizedBox(width: 5),
+              Expanded(child: Text(event.venue, style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.w700))),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: FilledButton.icon(
+                  onPressed: () => _toast(context, 'RSVP saved for ${event.title}'),
+                  icon: const Icon(Icons.check_circle_rounded),
+                  label: const Text('RSVP'),
+                ),
+              ),
+              const SizedBox(width: 10),
+              IconButton.filledTonal(
+                onPressed: () => _toast(context, 'Reminder set for ${event.title}'),
+                icon: const Icon(Icons.notifications_active_rounded),
+              ),
+            ],
+          ),
+        ],
+      ),
+    ),
+  );
+  }
+
+  void _toast(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+  }
+}
+
+class _EventCard extends StatelessWidget {
+  const _EventCard({required this.event, required this.onTap});
+
+  final CampusEvent event;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: FrostedCard(
-        padding: const EdgeInsets.all(0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        onTap: onTap,
+        padding: const EdgeInsets.all(14),
+        child: Row(
           children: [
             Container(
-              height: 150,
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
+              width: 78,
+              height: 88,
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 gradient: event.category == 'Music' ? AppColors.orangeGradient : AppColors.purpleGradient,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+                borderRadius: BorderRadius.circular(24),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(color: AppColors.mint, borderRadius: BorderRadius.circular(999)),
-                    child: Text(event.date, style: const TextStyle(color: AppColors.bg, fontWeight: FontWeight.w900, fontSize: 11)),
-                  ),
+                  Text(event.date.split(' ').first, style: const TextStyle(fontSize: 25, fontWeight: FontWeight.w900, height: .9)),
+                  const SizedBox(height: 4),
+                  Text(event.date.split(' ').length > 1 ? event.date.split(' ').last.toUpperCase() : '', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: Colors.white70)),
                   const Spacer(),
-                  Text(event.title, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w900)),
-                  Text(event.venue, style: const TextStyle(color: Colors.white70)),
+                  Icon(_iconForCategory(event.category), size: 19, color: Colors.white),
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(18),
+            const SizedBox(width: 14),
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(event.description, style: const TextStyle(color: AppColors.muted, height: 1.45)),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: FilledButton.icon(
-                          onPressed: () => _toast(context, 'RSVP saved for ${event.title}'),
-                          icon: const Icon(Icons.check_circle_rounded),
-                          label: const Text('RSVP'),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () => _toast(context, 'Reminder set for ${event.title}'),
-                          icon: const Icon(Icons.notifications_active_rounded),
-                          label: const Text('Reminder'),
-                        ),
-                      ),
-                    ],
-                  ),
+                  Text(event.category.toUpperCase(), style: const TextStyle(color: AppColors.orange, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: .35)),
+                  const SizedBox(height: 5),
+                  Text(event.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w900, height: 1.12)),
+                  const SizedBox(height: 5),
+                  Text(event.venue, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: AppColors.muted, fontSize: 12)),
+                  const SizedBox(height: 8),
+                  Text(event.description, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: AppColors.muted, fontSize: 12, height: 1.3)),
                 ],
               ),
+            ),
+            const SizedBox(width: 8),
+            IconButton(
+              onPressed: () => _toast(context, 'Reminder set for ${event.title}'),
+              icon: const Icon(Icons.notifications_none_rounded),
             ),
           ],
         ),
       ),
     );
+  }
+
+  IconData _iconForCategory(String category) {
+    switch (category) {
+      case 'Music':
+        return Icons.music_note_rounded;
+      case 'Podcast':
+        return Icons.podcasts_rounded;
+      default:
+        return Icons.auto_awesome_rounded;
+    }
   }
 
   void _toast(BuildContext context, String message) {

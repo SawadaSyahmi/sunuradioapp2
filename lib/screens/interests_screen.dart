@@ -34,37 +34,48 @@ class _InterestsScreenState extends State<InterestsScreen> {
                     child: const Text('Skip', style: TextStyle(color: Colors.white70)),
                   ),
                 ),
-                const Spacer(),
+                const SizedBox(height: 20),
                 const Text(
                   'What moves you?',
-                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.w900, height: 1.02),
+                  style: TextStyle(fontSize: 34, fontWeight: FontWeight.w900, height: 1.02, letterSpacing: -.8),
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  'Pick at least 3 — we will curate your feed.',
-                  style: TextStyle(color: AppColors.muted),
+                  'Pick at least 3 topics so SUN4U can curate your home feed.',
+                  style: TextStyle(color: AppColors.muted, height: 1.4),
                 ),
-                const SizedBox(height: 28),
-                Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
-                  children: interests.map((interest) {
-                    final selected = _selected.contains(interest);
-                    return FilterChip(
-                      label: Text(interest),
-                      selected: selected,
-                      showCheckmark: false,
-                      onSelected: (_) {
-                        setState(() {
-                          selected ? _selected.remove(interest) : _selected.add(interest);
-                        });
-                      },
-                    );
-                  }).toList(),
+                const SizedBox(height: 26),
+                Expanded(
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    child: Wrap(
+                      spacing: 10,
+                      runSpacing: 10,
+                      children: interests.map((interest) {
+                        final selected = _selected.contains(interest);
+                        return FilterChip(
+                          label: Text(interest),
+                          selected: selected,
+                          showCheckmark: false,
+                          avatar: selected ? const Icon(Icons.check_rounded, size: 16, color: Colors.white) : null,
+                          onSelected: (_) {
+                            setState(() {
+                              selected ? _selected.remove(interest) : _selected.add(interest);
+                            });
+                          },
+                        );
+                      }).toList(),
+                    ),
+                  ),
                 ),
-                const Spacer(flex: 2),
+                const SizedBox(height: 18),
+                Text(
+                  '${_selected.length} selected',
+                  style: const TextStyle(color: AppColors.muted, fontWeight: FontWeight.w800),
+                ),
+                const SizedBox(height: 12),
                 PrimaryButton(
-                  label: 'Continue (${_selected.length})',
+                  label: 'Continue',
                   onPressed: () {
                     Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AllSetScreen()));
                   },

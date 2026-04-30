@@ -33,44 +33,56 @@ class _MainShellState extends State<MainShell> {
       body: Stack(
         children: [
           IndexedStack(index: _index, children: _screens),
-          if (_index != 0)
-            Positioned.fill(
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 120,
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: MiniPlayer(
-                  onOpenPlayer: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const NowPlayingScreen()),
-                  ),
-                ),
+          Positioned.fill(
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 110,
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 250),
+                switchInCurve: Curves.easeOutCubic,
+                switchOutCurve: Curves.easeInCubic,
+                child: _index == 0
+                    ? const SizedBox.shrink(key: ValueKey('no-mini-player'))
+                    : MiniPlayer(
+                        key: const ValueKey('mini-player'),
+                        onOpenPlayer: () => Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const NowPlayingScreen()),
+                        ),
+                      ),
               ),
             ),
+          ),
         ],
       ),
       bottomNavigationBar: SafeArea(
         top: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(18, 0, 18, 16),
-          child: Container(
-            height: 68,
-            decoration: BoxDecoration(
-              color: const Color(0xFF080610),
-              borderRadius: BorderRadius.circular(28),
-              border: Border.all(color: Colors.white.withOpacity(.08)),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _NavItem(icon: Icons.home_rounded, label: 'Home', selected: _index == 0, onTap: () => _select(0)),
-                _NavItem(icon: Icons.headphones_rounded, label: 'Podcasts', selected: _index == 1, onTap: () => _select(1)),
-                _LiveNavItem(selected: _index == 2, onTap: () => _select(2)),
-                _NavItem(icon: Icons.calendar_month_rounded, label: 'Events', selected: _index == 3, onTap: () => _select(3)),
-                _NavItem(icon: Icons.person_rounded, label: 'Profile', selected: _index == 4, onTap: () => _select(4)),
-              ],
-            ),
+        minimum: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+        child: Container(
+          height: 74,
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          decoration: BoxDecoration(
+            color: const Color(0xEE080610),
+            borderRadius: BorderRadius.circular(30),
+            border: Border.all(color: Colors.white.withOpacity(.09)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(.45),
+                blurRadius: 28,
+                offset: const Offset(0, 16),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Expanded(child: _NavItem(icon: Icons.home_rounded, label: 'Home', selected: _index == 0, onTap: () => _select(0))),
+              Expanded(child: _NavItem(icon: Icons.headphones_rounded, label: 'Podcasts', selected: _index == 1, onTap: () => _select(1))),
+              Expanded(child: _LiveNavItem(selected: _index == 2, onTap: () => _select(2))),
+              Expanded(child: _NavItem(icon: Icons.calendar_month_rounded, label: 'Events', selected: _index == 3, onTap: () => _select(3))),
+              Expanded(child: _NavItem(icon: Icons.person_rounded, label: 'Profile', selected: _index == 4, onTap: () => _select(4))),
+            ],
           ),
         ),
       ),
@@ -91,17 +103,25 @@ class _NavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      customBorder: const CircleBorder(),
+      borderRadius: BorderRadius.circular(22),
       onTap: onTap,
-      child: SizedBox(
-        width: 62,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeOutCubic,
+        height: double.infinity,
+        decoration: BoxDecoration(
+          color: selected ? AppColors.purple.withOpacity(.18) : Colors.transparent,
+          borderRadius: BorderRadius.circular(22),
+        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: selected ? AppColors.purple : AppColors.dim, size: 22),
-            const SizedBox(height: 3),
+            Icon(icon, color: selected ? Colors.white : AppColors.dim, size: selected ? 23 : 21),
+            const SizedBox(height: 4),
             Text(
               label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 color: selected ? Colors.white : AppColors.dim,
                 fontSize: 10,
@@ -126,15 +146,32 @@ class _LiveNavItem extends StatelessWidget {
     return InkWell(
       customBorder: const CircleBorder(),
       onTap: onTap,
-      child: Container(
-        width: 58,
-        height: 58,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: selected ? AppColors.purple.withOpacity(.35) : const Color(0xFF12101C),
-          border: Border.all(color: Colors.white.withOpacity(.08)),
-        ),
-        child: Icon(Icons.podcasts_rounded, color: selected ? Colors.white : AppColors.dim),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 220),
+            curve: Curves.easeOutCubic,
+            width: selected ? 54 : 50,
+            height: selected ? 54 : 50,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: selected ? AppColors.orangeGradient : null,
+              color: selected ? null : const Color(0xFF141020),
+              border: Border.all(color: Colors.white.withOpacity(selected ? .18 : .08)),
+              boxShadow: selected
+                  ? [
+                      BoxShadow(
+                        color: AppColors.orange.withOpacity(.32),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
+                      ),
+                    ]
+                  : null,
+            ),
+            child: Icon(Icons.podcasts_rounded, color: selected ? Colors.white : AppColors.dim),
+          ),
+        ],
       ),
     );
   }

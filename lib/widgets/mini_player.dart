@@ -11,122 +11,100 @@ class MiniPlayer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      // MainShell already positions this just above the bottom navigation.
-      // Keep this at zero so the player does not float too high.
-      padding: const EdgeInsets.symmetric(horizontal: 18),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: InkWell(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(26),
         onTap: onOpenPlayer,
         child: Container(
-          height: 66,
+          height: 72,
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
             gradient: const LinearGradient(
-              colors: [
-                Color(0xFF5222B8),
-                Color(0xFF32146F),
-                Color(0xFF13091F),
-              ],
+              colors: [Color(0xFF5522B9), Color(0xFF2B145A), Color(0xFF11081D)],
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
             ),
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: AppColors.purple.withOpacity(.70), width: 1.4),
+            borderRadius: BorderRadius.circular(26),
+            border: Border.all(color: Colors.white.withOpacity(.12), width: 1.2),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(.45),
-                blurRadius: 24,
-                offset: const Offset(0, 12),
+                color: Colors.black.withOpacity(.48),
+                blurRadius: 28,
+                offset: const Offset(0, 14),
               ),
               BoxShadow(
-                color: AppColors.purple.withOpacity(.32),
-                blurRadius: 26,
+                color: AppColors.purple.withOpacity(.24),
+                blurRadius: 30,
                 spreadRadius: 1,
               ),
             ],
           ),
           child: Row(
             children: [
-              Container(
-                width: 46,
-                height: 46,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  gradient: AppColors.orangeGradient,
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.orange.withOpacity(.35),
-                      blurRadius: 16,
-                      offset: const Offset(0, 6),
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(18),
+                      gradient: AppColors.orangeGradient,
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.orange.withOpacity(.32),
+                          blurRadius: 18,
+                          offset: const Offset(0, 7),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                child: const Icon(Icons.graphic_eq_rounded, color: Colors.white, size: 24),
+                  ),
+                  const Icon(Icons.graphic_eq_rounded, color: Colors.white, size: 24),
+                ],
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: SizedBox(
-                  height: 46,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            width: 8,
-                            height: 8,
-                            decoration: const BoxDecoration(
-                              color: AppColors.mint,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          const Text(
-                            'LIVE',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 11,
-                              height: 1.0,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: .4,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              currentShow.title,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w900,
-                                fontSize: 15,
-                                height: 1.0,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 7),
-                      Text(
-                        currentShow.host,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Color(0xFFD2C5EA),
-                          fontSize: 13,
-                          height: 1.0,
-                          fontWeight: FontWeight.w600,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: 7,
+                          height: 7,
+                          decoration: const BoxDecoration(color: AppColors.mint, shape: BoxShape.circle),
                         ),
+                        const SizedBox(width: 6),
+                        const Text(
+                          'LIVE NOW',
+                          style: TextStyle(
+                            color: AppColors.mint,
+                            fontSize: 10,
+                            height: 1.0,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: .35,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      '${currentShow.title} · ${currentShow.host}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 14.5,
+                        height: 1.0,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(width: 10),
-              const PlayButton(size: 44),
+              const PlayButton(size: 46),
             ],
           ),
         ),
