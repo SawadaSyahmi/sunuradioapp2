@@ -1,9 +1,9 @@
+import 'package:device_preview/device_preview.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:device_preview/device_preview.dart';
 
 import 'core/app_theme.dart';
-import 'screens/splash_screen.dart';
+import 'screens/main_shell.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,14 +24,11 @@ class Sun4URadioApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'SUN4U Radio',
-
-      // Device Preview settings
       useInheritedMediaQuery: true,
       locale: DevicePreview.locale(context),
       builder: DevicePreview.appBuilder,
-
       theme: AppTheme.dark(),
-      home: const SplashScreen(),
+      home: const MainShell(),
     );
   }
 }
