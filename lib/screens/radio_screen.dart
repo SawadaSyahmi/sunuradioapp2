@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
@@ -44,11 +45,12 @@ class _RadioScreenState extends State<RadioScreen> {
                 ),
               ),
               DraggableScrollableSheet(
-                initialChildSize: .36,
-                minChildSize: .34,
-                maxChildSize: .76,
+                // Starts slightly lower so the player remains the focus.
+                initialChildSize: .28,
+                minChildSize: .18,
+                maxChildSize: .985,
                 snap: true,
-                snapSizes: const [.36, .76],
+                snapSizes: const [.28, .62, .985],
                 builder: (context, controller) {
                   return _DiscoverySheet(
                     controller: controller,
@@ -90,8 +92,8 @@ class _TopPlayer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    final artworkHeight = math.min(width - 52, maxHeight * .39).clamp(245.0, 360.0).toDouble();
-    final topGap = maxHeight < 760 ? 14.0 : 22.0;
+    final artworkHeight = math.min(width - 56, maxHeight * .33).clamp(210.0, 300.0).toDouble();
+    final topGap = maxHeight < 760 ? 10.0 : 16.0;
     final title = isRecorded ? episode!.title : currentShow.title;
     final speaker = isRecorded ? episode!.host : currentShow.host;
 
@@ -112,6 +114,7 @@ class _TopPlayer extends StatelessWidget {
             height: artworkHeight,
             child: ShowArtwork(
               borderRadius: 34,
+              showPlayerButton: true,
               icon: isRecorded ? Icons.mic_external_on_rounded : Icons.radio_rounded,
             ),
           ),
@@ -128,10 +131,10 @@ class _TopPlayer extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        fontSize: 25,
+                        fontSize: 28,
                         fontWeight: FontWeight.w900,
                         height: 1.0,
-                        letterSpacing: -.5,
+                        letterSpacing: -.75,
                       ),
                     ),
                     const SizedBox(height: 5),
@@ -152,48 +155,22 @@ class _TopPlayer extends StatelessWidget {
                 ),
             ],
           ),
-          SizedBox(height: maxHeight < 760 ? 12 : 18),
-          Center(
-            child: isRecorded ? const _RecordedControls() : const PlayButton(size: 66),
-          ),
+          SizedBox(height: maxHeight < 760 ? 8 : 10),
+          if (isRecorded)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(999),
+                child: const LinearProgressIndicator(
+                  value: .36,
+                  minHeight: 5,
+                  backgroundColor: Colors.white24,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              ),
+            ),
         ],
       ),
-    );
-  }
-}
-
-class _RecordedControls extends StatelessWidget {
-  const _RecordedControls();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 36),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(999),
-            child: const LinearProgressIndicator(
-              value: .36,
-              minHeight: 5,
-              backgroundColor: Colors.white24,
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-            ),
-          ),
-        ),
-        const SizedBox(height: 14),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            _TransportButton(icon: Icons.skip_previous_rounded),
-            SizedBox(width: 24),
-            PlayButton(size: 66),
-            SizedBox(width: 24),
-            _TransportButton(icon: Icons.skip_next_rounded),
-          ],
-        ),
-      ],
     );
   }
 }
@@ -304,14 +281,19 @@ class _DiscoverySheetState extends State<_DiscoverySheet> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xF21A1028),
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(34)),
-        border: Border.all(color: Colors.white.withOpacity(.08)),
+        color: const Color(0xE8180E26),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+        border: Border.all(color: Colors.white.withOpacity(.075)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(.50),
+            color: Colors.black.withOpacity(.55),
             blurRadius: 34,
-            offset: const Offset(0, -16),
+            offset: const Offset(0, -18),
+          ),
+          BoxShadow(
+            color: AppColors.purple.withOpacity(.16),
+            blurRadius: 26,
+            offset: const Offset(0, -8),
           ),
         ],
       ),
@@ -322,31 +304,33 @@ class _DiscoverySheetState extends State<_DiscoverySheet> {
           SliverToBoxAdapter(
             child: Column(
               children: [
-                const SizedBox(height: 10),
+                const SizedBox(height: 8),
                 Container(
-                  width: 22,
-                  height: 3,
+                  width: 34,
+                  height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(.42),
+                    color: Colors.white.withOpacity(.30),
                     borderRadius: BorderRadius.circular(999),
                   ),
                 ),
-                const SizedBox(height: 12),
-                _SheetTabs(
-                  selectedIndex: _tab,
-                  onChanged: (value) {
-                    setState(() => _tab = value);
-                    if (value != 0) widget.onGoLive();
-                  },
-                ),
-                const SizedBox(height: 18),
+                const SizedBox(height: 5),
               ],
             ),
           ),
+          SliverPersistentHeader(
+            pinned: true,
+            delegate: _PinnedTabsHeader(
+              selectedIndex: _tab,
+              onChanged: (value) {
+                setState(() => _tab = value);
+                if (value == 1) widget.onGoLive();
+              },
+            ),
+          ),
+          const SliverToBoxAdapter(child: SizedBox(height: 16)),
           if (_tab == 0) ..._previousContent(),
           if (_tab == 1) ..._upcomingContent(),
-          if (_tab == 2) ..._chatContent(),
-          const SliverToBoxAdapter(child: SizedBox(height: 124)),
+          const SliverToBoxAdapter(child: SizedBox(height: 152)),
         ],
       ),
     );
@@ -373,7 +357,7 @@ class _DiscoverySheetState extends State<_DiscoverySheet> {
         ),
       ),
       const SliverToBoxAdapter(child: SizedBox(height: 16)),
-      SliverToBoxAdapter(child: _SearchRow(onFilter: () => _toast(context, 'Filter coming soon'))),
+      SliverToBoxAdapter(child: _SearchRow(onSearch: () => _showSearchSheet(context), onFilter: () => _showFilterSheet(context))),
       const SliverToBoxAdapter(child: SizedBox(height: 14)),
       const SliverToBoxAdapter(child: _DividerLine()),
       SliverList(
@@ -395,35 +379,67 @@ class _DiscoverySheetState extends State<_DiscoverySheet> {
   }
 
   List<Widget> _upcomingContent() {
+    final featured = schedule.length > 2 ? schedule[2] : currentShow;
     return [
       SliverToBoxAdapter(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Container(
-            height: 128,
+            height: 132,
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(.07),
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: Colors.white.withOpacity(.08)),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.white.withOpacity(.12),
+                  AppColors.purple.withOpacity(.18),
+                  AppColors.orange.withOpacity(.12),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(26),
+              border: Border.all(color: Colors.white.withOpacity(.10)),
+              boxShadow: [BoxShadow(color: AppColors.purple.withOpacity(.14), blurRadius: 26, offset: const Offset(0, 12))],
             ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+            child: Row(
               children: [
-                const Text('(Auto swipe)', style: TextStyle(color: AppColors.muted, fontSize: 12, fontWeight: FontWeight.w700)),
-                const SizedBox(height: 26),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(
-                    5,
-                    (index) => Container(
-                      width: 7,
-                      height: 7,
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                      decoration: BoxDecoration(
-                        color: index == 0 ? AppColors.orange : Colors.white.withOpacity(.28),
-                        shape: BoxShape.circle,
+                Container(
+                  width: 82,
+                  height: 82,
+                  decoration: BoxDecoration(
+                    gradient: AppColors.orangeGradient,
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: [BoxShadow(color: AppColors.orange.withOpacity(.28), blurRadius: 18, offset: const Offset(0, 8))],
+                  ),
+                  child: const Icon(Icons.schedule_rounded, size: 34),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text('Next on SUN4U', style: TextStyle(color: AppColors.orange, fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: .35)),
+                      const SizedBox(height: 6),
+                      Text(featured.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: -.35)),
+                      const SizedBox(height: 4),
+                      Text('${featured.time} · ${featured.host}', maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: AppColors.muted, fontSize: 11.5, fontWeight: FontWeight.w700)),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: List.generate(
+                          5,
+                          (index) => Container(
+                            width: index == 0 ? 18 : 7,
+                            height: 7,
+                            margin: const EdgeInsets.only(right: 6),
+                            decoration: BoxDecoration(
+                              color: index == 0 ? AppColors.orange : Colors.white.withOpacity(.28),
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ],
@@ -432,7 +448,7 @@ class _DiscoverySheetState extends State<_DiscoverySheet> {
         ),
       ),
       const SliverToBoxAdapter(child: SizedBox(height: 16)),
-      SliverToBoxAdapter(child: _SearchRow(onFilter: () => _toast(context, 'Showing all upcoming shows'))),
+      SliverToBoxAdapter(child: _SearchRow(onSearch: () => _showSearchSheet(context), onFilter: () => _showFilterSheet(context))),
       const SliverToBoxAdapter(child: SizedBox(height: 14)),
       const SliverToBoxAdapter(child: _DividerLine()),
       SliverList(
@@ -452,81 +468,74 @@ class _DiscoverySheetState extends State<_DiscoverySheet> {
     ];
   }
 
-  List<Widget> _chatContent() {
-    final messages = const [
-      _ChatMessage(name: 'Nadia', text: 'Morning team! Loving this segment today.', time: '09:30am', isWide: false),
-      _ChatMessage(name: 'Jason', text: 'Can you play the campus event promo again?', time: '09:29am', isWide: true),
-      _ChatMessage(name: 'Aina', text: 'The speaker tips are useful.', time: '09:28am', isWide: false),
-      _ChatMessage(name: 'Wei Han', text: 'Shoutout to FASS!', time: '09:27am', isWide: true),
-      _ChatMessage(name: 'Sofia', text: 'Please share the podcast link later.', time: '09:26am', isWide: false),
-      _ChatMessage(name: 'Daniel', text: 'This is giving real campus radio vibes.', time: '09:25am', isWide: true),
-    ];
+  void _showSearchSheet(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => const _SearchBottomSheet(),
+    );
+  }
 
-    return [
-      SliverList(
-        delegate: SliverChildBuilderDelegate(
-          (context, index) => _ChatBubble(message: messages[index]),
-          childCount: messages.length,
-        ),
-      ),
-      SliverToBoxAdapter(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 18, 24, 4),
-          child: Row(
-            children: [
-              Expanded(
-                child: Container(
-                  height: 56,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(.08),
-                    borderRadius: BorderRadius.circular(28),
-                    border: Border.all(color: Colors.white.withOpacity(.08)),
-                  ),
-                  child: Row(
-                    children: const [
-                      Expanded(
-                        child: Text('Write a message...', style: TextStyle(color: AppColors.dim, fontWeight: FontWeight.w700)),
-                      ),
-                      _MiniCircle(label: 'emoji'),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(width: 10),
-              InkWell(
-                customBorder: const CircleBorder(),
-                onTap: () => _toast(context, 'Message preview only'),
-                child: Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    gradient: AppColors.orangeGradient,
-                    shape: BoxShape.circle,
-                    boxShadow: [BoxShadow(color: AppColors.orange.withOpacity(.24), blurRadius: 16)],
-                  ),
-                  child: const Icon(Icons.send_rounded, size: 19),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      const SliverToBoxAdapter(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 24),
-          child: Text(
-            'Disclaimer: do not post unsuitable content.',
-            textAlign: TextAlign.center,
-            style: TextStyle(color: AppColors.muted, fontSize: 10, fontWeight: FontWeight.w700),
-          ),
-        ),
-      ),
-    ];
+  void _showFilterSheet(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (_) => const _FilterBottomSheet(),
+    );
   }
 
   void _toast(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+  }
+}
+
+class _PinnedTabsHeader extends SliverPersistentHeaderDelegate {
+  const _PinnedTabsHeader({required this.selectedIndex, required this.onChanged});
+
+  final int selectedIndex;
+  final ValueChanged<int> onChanged;
+
+  @override
+  double get minExtent => 54;
+
+  @override
+  double get maxExtent => 54;
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return ClipRRect(
+      borderRadius: BorderRadius.only(
+        topLeft: Radius.circular(shrinkOffset > 0 ? 0 : 28),
+        topRight: Radius.circular(shrinkOffset > 0 ? 0 : 28),
+      ),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: const Color(0xE51A1028),
+            border: Border(bottom: BorderSide(color: Colors.white.withOpacity(overlapsContent ? .12 : .04))),
+            boxShadow: overlapsContent
+                ? [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(.30),
+                      blurRadius: 18,
+                      offset: const Offset(0, 8),
+                    ),
+                  ]
+                : null,
+          ),
+          child: Center(
+            child: _SheetTabs(selectedIndex: selectedIndex, onChanged: onChanged),
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  bool shouldRebuild(covariant _PinnedTabsHeader oldDelegate) {
+    return oldDelegate.selectedIndex != selectedIndex || oldDelegate.onChanged != onChanged;
   }
 }
 
@@ -536,44 +545,63 @@ class _SheetTabs extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int> onChanged;
 
-  static const labels = ['Previous', 'Upcoming', 'Live Chat'];
+  static const labels = ['Previous', 'Upcoming'];
+  static const icons = [Icons.history_rounded, Icons.event_note_rounded];
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 48),
-      child: Row(
-        children: List.generate(labels.length, (index) {
-          final selected = selectedIndex == index;
-          return Expanded(
-            child: InkWell(
-              borderRadius: BorderRadius.circular(999),
-              onTap: () => onChanged(index),
-              child: Column(
-                children: [
-                  Text(
-                    labels[index],
-                    style: TextStyle(
-                      color: selected ? Colors.white : AppColors.muted,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w900,
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Container(
+        height: 38,
+        padding: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(.055),
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: Colors.white.withOpacity(.08)),
+        ),
+        child: Row(
+          children: List.generate(labels.length, (index) {
+            final selected = selectedIndex == index;
+            return Expanded(
+              child: InkWell(
+                borderRadius: BorderRadius.circular(999),
+                onTap: () => onChanged(index),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 180),
+                  curve: Curves.easeOutCubic,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(999),
+                    color: selected ? Colors.white.withOpacity(.18) : Colors.transparent,
+                    border: Border.all(
+                      color: selected ? Colors.white.withOpacity(.16) : Colors.transparent,
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    width: selected ? 48 : 0,
-                    height: 2,
-                    decoration: BoxDecoration(
-                      color: selected ? Colors.white : Colors.transparent,
-                      borderRadius: BorderRadius.circular(999),
-                    ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(icons[index], size: 14, color: selected ? Colors.white : AppColors.muted),
+                      const SizedBox(width: 5),
+                      Flexible(
+                        child: Text(
+                          labels[index],
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: selected ? Colors.white : AppColors.muted,
+                            fontSize: 10.8,
+                            fontWeight: selected ? FontWeight.w900 : FontWeight.w800,
+                            letterSpacing: -.1,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
-          );
-        }),
+            );
+          }),
+        ),
       ),
     );
   }
@@ -619,8 +647,9 @@ class _PreviousTile extends StatelessWidget {
 }
 
 class _SearchRow extends StatelessWidget {
-  const _SearchRow({required this.onFilter});
+  const _SearchRow({required this.onSearch, required this.onFilter});
 
+  final VoidCallback onSearch;
   final VoidCallback onFilter;
 
   @override
@@ -630,22 +659,33 @@ class _SearchRow extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: Container(
-              height: 56,
-              padding: const EdgeInsets.symmetric(horizontal: 18),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(.08),
-                borderRadius: BorderRadius.circular(28),
-                border: Border.all(color: Colors.white.withOpacity(.08)),
-              ),
-              child: Row(
-                children: const [
-                  Icon(Icons.search_rounded, color: AppColors.muted, size: 20),
-                  SizedBox(width: 10),
-                  Text('Search', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-                  Spacer(),
-                  _MiniCircle(label: 'magnifying\nglass'),
-                ],
+            child: InkWell(
+              borderRadius: BorderRadius.circular(24),
+              onTap: onSearch,
+              child: Container(
+                height: 52,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(.18),
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: Colors.white.withOpacity(.09)),
+                ),
+                child: Row(
+                  children: const [
+                    Icon(Icons.search_rounded, color: AppColors.muted, size: 20),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        'Search shows, hosts, topics',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(color: AppColors.muted, fontSize: 13.5, fontWeight: FontWeight.w800),
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    Icon(Icons.tune_rounded, color: AppColors.dim, size: 18),
+                  ],
+                ),
               ),
             ),
           ),
@@ -657,17 +697,187 @@ class _SearchRow extends StatelessWidget {
               width: 50,
               height: 50,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(.08),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Colors.white.withOpacity(.14), Colors.white.withOpacity(.06)],
+                ),
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.white.withOpacity(.08)),
+                border: Border.all(color: Colors.white.withOpacity(.10)),
               ),
-              child: const Center(
-                child: Text('Filter', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900)),
-              ),
+              child: const Icon(Icons.filter_alt_rounded, size: 20, color: Colors.white),
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+class _SearchBottomSheet extends StatelessWidget {
+  const _SearchBottomSheet();
+
+  @override
+  Widget build(BuildContext context) {
+    return _SheetModal(
+      title: 'Search SUN4U',
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TextField(
+            autofocus: true,
+            decoration: InputDecoration(
+              hintText: 'Search podcast, speaker, topic...',
+              prefixIcon: const Icon(Icons.search_rounded),
+              suffixIcon: IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(Icons.close_rounded),
+              ),
+            ),
+          ),
+          const SizedBox(height: 18),
+          const Text('Popular searches', style: TextStyle(fontWeight: FontWeight.w900)),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: const [
+              _SuggestionChip(label: 'Campus events'),
+              _SuggestionChip(label: 'Research stories'),
+              _SuggestionChip(label: 'Music'),
+              _SuggestionChip(label: 'Student voices'),
+              _SuggestionChip(label: 'Wellness'),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FilterBottomSheet extends StatelessWidget {
+  const _FilterBottomSheet();
+
+  @override
+  Widget build(BuildContext context) {
+    return _SheetModal(
+      title: 'Filter content',
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Category', style: TextStyle(fontWeight: FontWeight.w900)),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: const [
+              _SuggestionChip(label: 'All'),
+              _SuggestionChip(label: 'Podcast'),
+              _SuggestionChip(label: 'Live Show'),
+              _SuggestionChip(label: 'Music'),
+              _SuggestionChip(label: 'Interviews'),
+              _SuggestionChip(label: 'Events'),
+            ],
+          ),
+          const SizedBox(height: 18),
+          const Text('Sort by', style: TextStyle(fontWeight: FontWeight.w900)),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: const [
+              _SuggestionChip(label: 'Latest'),
+              _SuggestionChip(label: 'Upcoming first'),
+              _SuggestionChip(label: 'Most saved'),
+            ],
+          ),
+          const SizedBox(height: 20),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              onPressed: () => Navigator.pop(context),
+              icon: const Icon(Icons.check_rounded),
+              label: const Text('Apply filter'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SheetModal extends StatelessWidget {
+  const _SheetModal({required this.title, required this.child});
+
+  final String title;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final bottom = MediaQuery.viewInsetsOf(context).bottom;
+    return Padding(
+      padding: EdgeInsets.only(bottom: bottom),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1A1028),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+          border: Border.all(color: Colors.white.withOpacity(.10)),
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(.45), blurRadius: 28)],
+        ),
+        child: SafeArea(
+          top: false,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 26,
+                  height: 3,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(.35),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: -.3),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.close_rounded),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              child,
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SuggestionChip extends StatelessWidget {
+  const _SuggestionChip({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return ActionChip(
+      label: Text(label),
+      onPressed: () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$label selected'))),
     );
   }
 }
@@ -800,95 +1010,45 @@ class _SmallAction extends StatelessWidget {
         width: 42,
         height: 42,
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(.08),
+          color: Colors.white.withOpacity(.075),
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.white.withOpacity(.08)),
+          border: Border.all(color: Colors.white.withOpacity(.09)),
         ),
-        child: Center(
-          child: Text(
-            label,
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 7.2, fontWeight: FontWeight.w900, height: 1.05),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _MiniCircle extends StatelessWidget {
-  const _MiniCircle({required this.label});
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 42,
-      height: 42,
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(.10),
-        shape: BoxShape.circle,
-        border: Border.all(color: Colors.white.withOpacity(.08)),
-      ),
-      child: Center(
-        child: Text(
-          label,
-          textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 7.5, fontWeight: FontWeight.w800, height: .95),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(_actionIcon(label), size: 15, color: Colors.white.withOpacity(.92)),
+            const SizedBox(height: 1),
+            Text(
+              _shortActionLabel(label),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 7.2, fontWeight: FontWeight.w900, height: 1.0),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-class _ChatMessage {
-  const _ChatMessage({required this.name, required this.text, required this.time, required this.isWide});
-
-  final String name;
-  final String text;
-  final String time;
-  final bool isWide;
+IconData _actionIcon(String label) {
+  final lower = label.toLowerCase();
+  if (lower.contains('reminder')) return Icons.notifications_active_rounded;
+  if (lower.contains('share')) return Icons.ios_share_rounded;
+  if (lower.contains('save')) return Icons.bookmark_rounded;
+  if (lower.contains('play')) return Icons.play_arrow_rounded;
+  return Icons.more_horiz_rounded;
 }
 
-class _ChatBubble extends StatelessWidget {
-  const _ChatBubble({required this.message});
-
-  final _ChatMessage message;
-
-  @override
-  Widget build(BuildContext context) {
-    final bubbleWidth = MediaQuery.sizeOf(context).width * (message.isWide ? .48 : .30);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 8, 24, 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 10, bottom: 4),
-            child: Text(message.name, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: AppColors.muted)),
-          ),
-          Row(
-            children: [
-              Container(
-                width: bubbleWidth,
-                constraints: const BoxConstraints(minHeight: 28),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(.10),
-                  borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: Colors.white.withOpacity(.08)),
-                ),
-                child: Text(message.text, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700)),
-              ),
-              const SizedBox(width: 7),
-              Text(message.time, style: const TextStyle(color: AppColors.muted, fontSize: 9, fontWeight: FontWeight.w800)),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
+String _shortActionLabel(String label) {
+  final lower = label.toLowerCase();
+  if (lower.contains('reminder')) return 'Alert';
+  if (lower.contains('share')) return 'Share';
+  if (lower.contains('save')) return 'Save';
+  if (lower.contains('play')) return 'Play';
+  return label.replaceAll('\n', ' ');
 }
 
 IconData _iconForCategory(String category) {

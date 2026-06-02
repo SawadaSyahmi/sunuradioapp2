@@ -1,8 +1,12 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
+
 import '../core/app_colors.dart';
+import '../services/onboarding_store.dart';
 import '../widgets/app_logo.dart';
 import '../widgets/gradient_background.dart';
+import 'main_shell.dart';
 import 'onboarding_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -16,15 +20,20 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Timer(const Duration(milliseconds: 1300), () {
-      if (!mounted) return;
-      Navigator.of(context).pushReplacement(
-        PageRouteBuilder(
-          pageBuilder: (_, __, ___) => const OnboardingScreen(),
-          transitionsBuilder: (_, animation, __, child) => FadeTransition(opacity: animation, child: child),
-        ),
-      );
-    });
+    unawaited(_routeAfterSplash());
+  }
+
+  Future<void> _routeAfterSplash() async {
+    await Future<void>.delayed(const Duration(milliseconds: 1200));
+    final completed = await OnboardingStore.isCompleted();
+
+    if (!mounted) return;
+    Navigator.of(context).pushReplacement(
+      PageRouteBuilder(
+        pageBuilder: (_, __, ___) => completed ? const MainShell() : const OnboardingScreen(),
+        transitionsBuilder: (_, animation, __, child) => FadeTransition(opacity: animation, child: child),
+      ),
+    );
   }
 
   @override

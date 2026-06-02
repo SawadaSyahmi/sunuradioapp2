@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+
 import '../core/app_colors.dart';
+import '../services/onboarding_store.dart';
 import '../widgets/app_logo.dart';
 import '../widgets/gradient_background.dart';
 import '../widgets/primary_button.dart';
 import 'interests_screen.dart';
+import 'main_shell.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -16,12 +19,27 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _controller = PageController();
   int _page = 0;
 
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   void _next() {
     if (_page == 0) {
       _controller.nextPage(duration: const Duration(milliseconds: 450), curve: Curves.easeOutCubic);
     } else {
       Navigator.of(context).push(MaterialPageRoute(builder: (_) => const InterestsScreen()));
     }
+  }
+
+  Future<void> _finishAndEnterApp() async {
+    await OnboardingStore.markCompleted();
+    if (!mounted) return;
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const MainShell()),
+      (_) => false,
+    );
   }
 
   @override
@@ -37,9 +55,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 Align(
                   alignment: Alignment.topRight,
                   child: TextButton(
-                    onPressed: () => Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(builder: (_) => const InterestsScreen()),
-                    ),
+                    onPressed: _finishAndEnterApp,
                     child: const Text('Skip', style: TextStyle(color: Colors.white70)),
                   ),
                 ),
@@ -73,9 +89,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 PrimaryButton(label: _page == 0 ? 'Get Started' : 'Continue', onPressed: _next),
                 const SizedBox(height: 14),
                 TextButton(
-                  onPressed: () => Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (_) => const InterestsScreen()),
-                  ),
+                  onPressed: _finishAndEnterApp,
                   child: const Text(
                     'Continue without sign-in',
                     style: TextStyle(color: Colors.white54, fontSize: 12),

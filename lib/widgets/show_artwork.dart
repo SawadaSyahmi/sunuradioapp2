@@ -1,6 +1,9 @@
 import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+
 import '../core/app_colors.dart';
+import 'play_button.dart';
 
 class ShowArtwork extends StatelessWidget {
   const ShowArtwork({
@@ -8,12 +11,14 @@ class ShowArtwork extends StatelessWidget {
     this.height,
     this.icon = Icons.headphones_rounded,
     this.showLogo = true,
+    this.showPlayerButton = true,
     this.borderRadius = 32,
   });
 
   final double? height;
   final IconData icon;
   final bool showLogo;
+  final bool showPlayerButton;
   final double borderRadius;
 
   @override
@@ -52,12 +57,12 @@ class ShowArtwork extends StatelessWidget {
           ),
           Center(
             child: Container(
-              width: 114,
-              height: 114,
+              width: 112,
+              height: 112,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.black.withOpacity(.08),
-                border: Border.all(color: Colors.white.withOpacity(.17), width: 1.4),
+                color: Colors.black.withOpacity(.06),
+                border: Border.all(color: Colors.white.withOpacity(.16), width: 1.4),
               ),
               child: Icon(icon, size: 58, color: Colors.white.withOpacity(.90)),
             ),
@@ -68,14 +73,22 @@ class ShowArtwork extends StatelessWidget {
               left: 0,
               right: 0,
               child: Opacity(
-                opacity: .72,
+                opacity: .80,
                 child: Column(
                   children: const [
-                    Text('SUN4U', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, letterSpacing: -.5)),
-                    Text('RADIO', style: TextStyle(fontSize: 7, fontWeight: FontWeight.w900, height: .8)),
+                    Text('SUN4U', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, letterSpacing: -.6)),
+                    SizedBox(height: 2),
+                    Text('R A D I O', style: TextStyle(fontSize: 8.5, fontWeight: FontWeight.w800, letterSpacing: 4.0, height: .95)),
                   ],
                 ),
               ),
+            ),
+          if (showPlayerButton)
+            const Positioned(
+              left: 0,
+              right: 0,
+              bottom: 18,
+              child: Center(child: PlayButton(size: 66)),
             ),
         ],
       ),

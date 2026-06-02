@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
+
 import '../core/app_colors.dart';
 import '../services/radio_player_controller.dart';
 
@@ -32,16 +33,17 @@ class PlayButton extends StatelessWidget {
             height: size,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: filled ? Colors.white : Colors.white.withOpacity(.08),
-              border: Border.all(color: Colors.white.withOpacity(.15)),
-              boxShadow: filled
-                  ? [BoxShadow(color: AppColors.orange.withOpacity(.30), blurRadius: 22)]
-                  : null,
+              gradient: filled ? AppColors.orangeGradient : null,
+              color: filled ? null : Colors.white.withOpacity(.08),
+              border: Border.all(color: Colors.white.withOpacity(.16), width: 1.2),
+              boxShadow: [
+                BoxShadow(color: (filled ? AppColors.orange : Colors.black).withOpacity(.30), blurRadius: 22),
+              ],
             ),
             child: Icon(
               playing ? Icons.pause_rounded : Icons.play_arrow_rounded,
-              color: filled ? AppColors.orange : Colors.white,
-              size: size * .46,
+              color: Colors.white,
+              size: size * .48,
             ),
           ),
         );

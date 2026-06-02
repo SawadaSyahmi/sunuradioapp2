@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../core/app_colors.dart';
 import '../data/demo_data.dart';
+import '../services/onboarding_store.dart';
 import '../widgets/gradient_background.dart';
 import '../widgets/primary_button.dart';
 import '../widgets/play_button.dart';
@@ -82,10 +83,14 @@ class AllSetScreen extends StatelessWidget {
                 const Spacer(),
                 PrimaryButton(
                   label: 'Start Listening',
-                  onPressed: () => Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (_) => const MainShell()),
-                    (_) => false,
-                  ),
+                  onPressed: () async {
+                    await OnboardingStore.markCompleted();
+                    if (!context.mounted) return;
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (_) => const MainShell()),
+                      (_) => false,
+                    );
+                  },
                 ),
               ],
             ),

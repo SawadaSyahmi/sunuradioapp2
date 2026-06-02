@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import '../core/app_colors.dart';
 import '../data/demo_data.dart';
+import '../services/onboarding_store.dart';
 import '../widgets/gradient_background.dart';
 import '../widgets/primary_button.dart';
 import 'all_set_screen.dart';
+import 'main_shell.dart';
 
 class InterestsScreen extends StatefulWidget {
   const InterestsScreen({super.key});
@@ -14,6 +16,15 @@ class InterestsScreen extends StatefulWidget {
 
 class _InterestsScreenState extends State<InterestsScreen> {
   final Set<String> _selected = {'Music', 'Design', 'Podcasts', 'Events'};
+
+  Future<void> _finishAndEnterApp() async {
+    await OnboardingStore.markCompleted();
+    if (!mounted) return;
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const MainShell()),
+      (_) => false,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,9 +39,7 @@ class _InterestsScreenState extends State<InterestsScreen> {
                 Align(
                   alignment: Alignment.topRight,
                   child: TextButton(
-                    onPressed: () => Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(builder: (_) => const AllSetScreen()),
-                    ),
+                    onPressed: _finishAndEnterApp,
                     child: const Text('Skip', style: TextStyle(color: Colors.white70)),
                   ),
                 ),

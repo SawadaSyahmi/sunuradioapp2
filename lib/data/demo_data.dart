@@ -16,6 +16,7 @@ const schedule = <RadioShow>[
   RadioShow(title: 'Design Critiques', host: 'Sarah L.', time: '10:00 AM – 12:00 PM', tags: ['Design', 'Lectures']),
   RadioShow(title: 'Indie Rock Hour', host: 'CMAT Radio', time: '12:00 PM – 2:00 PM', tags: ['Music', 'Indie Rock']),
   RadioShow(title: 'Faculty Files', host: 'Dr. Lim', time: '2:00 PM – 4:00 PM', tags: ['Research', 'Campus']),
+  RadioShow(title: 'Student Voices Live', host: 'Nadia & Jason', time: '5:00 PM – 6:00 PM', tags: ['Campus', 'Talks']),
   RadioShow(title: 'Late Night Study', host: 'Station Team', time: '10:00 PM', tags: ['Wellness', 'Station']),
 ];
 
@@ -25,32 +26,35 @@ const podcasts = <PodcastEpisode>[
     host: 'Sunway Voices',
     duration: '18 min',
     category: 'Spoken Word',
-    description:
-        'Student poets share short reflections on identity, campus life, and creativity.',
+    description: 'Student poets share short reflections on identity, campus life, and creativity.',
   ),
   PodcastEpisode(
     title: 'Field Notes: Research Stories',
     host: 'FASS & FET Students',
     duration: '22 min',
     category: 'Research',
-    description:
-        'Quick student-friendly explainers on research projects happening around campus.',
+    description: 'Quick student-friendly explainers on research projects happening around campus.',
   ),
   PodcastEpisode(
     title: 'Talks After Class',
     host: 'Daniel',
     duration: '31 min',
     category: 'Interviews',
-    description:
-        'Relaxed conversations with lecturers, alumni, and student societies after class.',
+    description: 'Relaxed conversations with lecturers, alumni, and student societies after class.',
   ),
   PodcastEpisode(
     title: 'Late Night Study Beats',
     host: 'Station Team',
     duration: '45 min',
     category: 'Wellness',
-    description:
-        'A calming mix for revision nights, assignment pushes, and quiet campus walks.',
+    description: 'A calming mix for revision nights, assignment pushes, and quiet campus walks.',
+  ),
+  PodcastEpisode(
+    title: 'Campus Makers',
+    host: 'Innovation Club',
+    duration: '28 min',
+    category: 'Research',
+    description: 'Stories from students building apps, robots, digital media projects, and creative prototypes.',
   ),
 ];
 
@@ -75,6 +79,13 @@ const events = <CampusEvent>[
     venue: 'Library Studio',
     category: 'Podcast',
     description: 'Try a 5-minute podcast segment and get feedback from the station crew.',
+  ),
+  CampusEvent(
+    title: 'FASS Culture Night',
+    date: '18 May',
+    venue: 'Sunway University Hall',
+    category: 'Showcase',
+    description: 'An evening of stories, performances, and student-led cultural highlights.',
   ),
 ];
 
