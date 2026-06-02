@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/app_colors.dart';
+import '../data/demo_data.dart';
 import '../widgets/app_logo.dart';
 import '../widgets/frosted_card.dart';
 import '../widgets/gradient_background.dart';
@@ -70,6 +71,20 @@ class SettingsScreen extends StatelessWidget {
             _SettingsSection(
               title: 'App & Community',
               items: [
+                _SettingsItem(
+                  icon: Icons.cloud_sync_rounded,
+                  iconColor: AppColors.orange,
+                  title: 'Refresh cloud data',
+                  subtitle: sun4ULoadedFromSupabase ? 'Loaded from Supabase' : 'Using fallback data',
+                  onTap: () async {
+                    final ok = await loadSun4UDataFromSupabase();
+                    if (!context.mounted) return;
+                    _toast(
+                      context,
+                      ok ? 'Supabase data refreshed' : 'Still using fallback: ${sun4ULastLoadError ?? 'unknown error'}',
+                    );
+                  },
+                ),
                 _SettingsItem(
                   icon: Icons.dark_mode_rounded,
                   iconColor: AppColors.violet,

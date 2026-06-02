@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 import '../core/app_colors.dart';
+import '../data/demo_data.dart';
 import 'events_screen.dart';
 import 'radio_screen.dart';
 import 'settings_screen.dart';
@@ -14,14 +15,36 @@ class MainShell extends StatefulWidget {
   State<MainShell> createState() => _MainShellState();
 }
 
-class _MainShellState extends State<MainShell> {
+class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
   int _index = 1;
 
-  static const List<Widget> _screens = <Widget>[
-    EventsScreen(),
-    RadioScreen(),
-    SettingsScreen(),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    loadSun4UDataFromSupabase();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      loadSun4UDataFromSupabase();
+    }
+  }
+
+  List<Widget> _buildScreens(int version) {
+    return <Widget>[
+      EventsScreen(key: ValueKey('events_$version')),
+      RadioScreen(key: ValueKey('radio_$version')),
+      SettingsScreen(key: ValueKey('settings_$version')),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +53,14 @@ class _MainShellState extends State<MainShell> {
       resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
-          Positioned.fill(child: _screens[_index]),
+          Positioned.fill(
+            child: ValueListenableBuilder<int>(
+              valueListenable: sun4UDataVersion,
+              builder: (context, version, _) {
+                return IndexedStack(index: _index, children: _buildScreens(version));
+              },
+            ),
+          ),
           Positioned(
             left: 0,
             right: 0,

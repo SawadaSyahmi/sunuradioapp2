@@ -69,7 +69,7 @@ class LiveScheduleScreen extends StatelessWidget {
             const SizedBox(height: 14),
             InkWell(
               borderRadius: BorderRadius.circular(24),
-              onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ShowDetailScreen(show: currentShow))),
+              onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => ShowDetailScreen(show: currentShow))),
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(

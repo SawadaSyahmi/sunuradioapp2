@@ -1,12 +1,23 @@
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/app_theme.dart';
+import 'data/demo_data.dart';
 import 'screens/splash_screen.dart';
+import 'services/supabase_config.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  if (SupabaseConfig.isConfigured) {
+    await Supabase.initialize(
+      url: SupabaseConfig.projectUrl,
+      anonKey: SupabaseConfig.anonKey,
+    );
+    await loadSun4UDataFromSupabase();
+  }
 
   runApp(
     DevicePreview(

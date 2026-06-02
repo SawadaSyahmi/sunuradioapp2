@@ -78,7 +78,7 @@ class NowPlayingScreen extends StatelessWidget {
                         ),
                         IconButton.filledTonal(
                           onPressed: () => Navigator.of(context).push(
-                            MaterialPageRoute(builder: (_) => const ShowDetailScreen(show: currentShow)),
+                            MaterialPageRoute(builder: (_) => ShowDetailScreen(show: currentShow)),
                           ),
                           icon: const Icon(Icons.more_horiz_rounded),
                         ),
