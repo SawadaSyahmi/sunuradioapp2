@@ -42,55 +42,67 @@ class ShowArtwork extends StatelessWidget {
         ],
       ),
       clipBehavior: Clip.antiAlias,
-      child: Stack(
-        children: [
-          Positioned.fill(child: CustomPaint(painter: _ArtworkPainter())),
-          Positioned(
-            left: -22,
-            top: -22,
-            child: _BlurCircle(size: 160, color: Colors.white.withOpacity(.16)),
-          ),
-          Positioned(
-            right: -30,
-            bottom: -35,
-            child: _BlurCircle(size: 170, color: AppColors.orange.withOpacity(.24)),
-          ),
-          Center(
-            child: Container(
-              width: 112,
-              height: 112,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.black.withOpacity(.06),
-                border: Border.all(color: Colors.white.withOpacity(.16), width: 1.4),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final cardHeight = constraints.maxHeight;
+          final visualTop = (cardHeight * .22).clamp(46.0, 72.0).toDouble();
+
+          return Stack(
+            children: [
+              Positioned.fill(child: CustomPaint(painter: _ArtworkPainter())),
+              Positioned(
+                left: -22,
+                top: -22,
+                child: _BlurCircle(size: 160, color: Colors.white.withOpacity(.16)),
               ),
-              child: Icon(icon, size: 58, color: Colors.white.withOpacity(.90)),
-            ),
-          ),
-          if (showLogo)
-            Positioned(
-              top: 28,
-              left: 0,
-              right: 0,
-              child: Opacity(
-                opacity: .80,
-                child: Column(
-                  children: const [
-                    Text('SUN4U', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, letterSpacing: -.6)),
-                    SizedBox(height: 2),
-                    Text('R A D I O', style: TextStyle(fontSize: 8.5, fontWeight: FontWeight.w800, letterSpacing: 4.0, height: .95)),
-                  ],
+              Positioned(
+                right: -30,
+                bottom: -35,
+                child: _BlurCircle(size: 170, color: AppColors.orange.withOpacity(.24)),
+              ),
+              Positioned(
+                top: visualTop,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: Container(
+                    width: 92,
+                    height: 92,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.black.withOpacity(.06),
+                      border: Border.all(color: Colors.white.withOpacity(.16), width: 1.4),
+                    ),
+                    child: Icon(icon, size: 48, color: Colors.white.withOpacity(.90)),
+                  ),
                 ),
               ),
-            ),
-          if (showPlayerButton)
-            const Positioned(
-              left: 0,
-              right: 0,
-              bottom: 18,
-              child: Center(child: PlayButton(size: 66)),
-            ),
-        ],
+              if (showLogo)
+                Positioned(
+                  top: 26,
+                  left: 0,
+                  right: 0,
+                  child: Opacity(
+                    opacity: .82,
+                    child: Column(
+                      children: const [
+                        Text('SUN4U', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, letterSpacing: -.6)),
+                        SizedBox(height: 2),
+                        Text('R A D I O', style: TextStyle(fontSize: 8.5, fontWeight: FontWeight.w800, letterSpacing: 4.0, height: .95)),
+                      ],
+                    ),
+                  ),
+                ),
+              if (showPlayerButton)
+                const Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 18,
+                  child: Center(child: PlayButton(size: 58)),
+                ),
+            ],
+          );
+        },
       ),
     );
   }

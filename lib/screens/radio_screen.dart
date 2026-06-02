@@ -45,12 +45,12 @@ class _RadioScreenState extends State<RadioScreen> {
                 ),
               ),
               DraggableScrollableSheet(
-                // Starts slightly lower so the player remains the focus.
-                initialChildSize: .28,
-                minChildSize: .18,
+                // Starts higher so the sheet fills the empty middle area.
+                initialChildSize: .46,
+                minChildSize: .34,
                 maxChildSize: .985,
                 snap: true,
-                snapSizes: const [.28, .62, .985],
+                snapSizes: const [.46, .70, .985],
                 builder: (context, controller) {
                   return _DiscoverySheet(
                     controller: controller,
@@ -92,13 +92,13 @@ class _TopPlayer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    final artworkHeight = math.min(width - 56, maxHeight * .33).clamp(210.0, 300.0).toDouble();
-    final topGap = maxHeight < 760 ? 10.0 : 16.0;
+    final artworkHeight = math.min(width - 50, maxHeight * .33).clamp(220.0, 300.0).toDouble();
+    final topGap = maxHeight < 760 ? 6.0 : 8.0;
     final title = isRecorded ? episode!.title : currentShow.title;
     final speaker = isRecorded ? episode!.host : currentShow.host;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 14, 24, 0),
+      padding: const EdgeInsets.fromLTRB(22, 4, 22, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -118,7 +118,7 @@ class _TopPlayer extends StatelessWidget {
               icon: isRecorded ? Icons.mic_external_on_rounded : Icons.radio_rounded,
             ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 8),
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
@@ -131,7 +131,7 @@ class _TopPlayer extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        fontSize: 28,
+                        fontSize: 26,
                         fontWeight: FontWeight.w900,
                         height: 1.0,
                         letterSpacing: -.75,
@@ -142,7 +142,7 @@ class _TopPlayer extends StatelessWidget {
                       isRecorded ? speaker : 'Speaker 1 & Speaker 2 · ${speaker}',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(color: AppColors.muted, fontSize: 12, fontWeight: FontWeight.w700),
+                      style: const TextStyle(color: AppColors.muted, fontSize: 11.5, fontWeight: FontWeight.w700),
                     ),
                   ],
                 ),
@@ -155,7 +155,7 @@ class _TopPlayer extends StatelessWidget {
                 ),
             ],
           ),
-          SizedBox(height: maxHeight < 760 ? 8 : 10),
+          SizedBox(height: maxHeight < 760 ? 4 : 6),
           if (isRecorded)
             Padding(
               padding: const EdgeInsets.only(top: 4),
@@ -184,7 +184,7 @@ class _TransportButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: 52,
-      height: 52,
+      height: 48,
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(.075),
         shape: BoxShape.circle,
@@ -219,7 +219,7 @@ class _StatusDot extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 9),
-          Text(label, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+          Text(label, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
         ],
       ),
     );
@@ -304,16 +304,18 @@ class _DiscoverySheetState extends State<_DiscoverySheet> {
           SliverToBoxAdapter(
             child: Column(
               children: [
-                const SizedBox(height: 8),
+                const SizedBox(height: 7),
                 Container(
-                  width: 34,
+                  width: 46,
                   height: 4,
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(.30),
                     borderRadius: BorderRadius.circular(999),
                   ),
                 ),
-                const SizedBox(height: 5),
+                const SizedBox(height: 12),
+                _SearchRow(onSearch: () => _showSearchSheet(context)),
+                const SizedBox(height: 10),
               ],
             ),
           ),
@@ -327,10 +329,10 @@ class _DiscoverySheetState extends State<_DiscoverySheet> {
               },
             ),
           ),
-          const SliverToBoxAdapter(child: SizedBox(height: 16)),
+          const SliverToBoxAdapter(child: SizedBox(height: 12)),
           if (_tab == 0) ..._previousContent(),
           if (_tab == 1) ..._upcomingContent(),
-          const SliverToBoxAdapter(child: SizedBox(height: 152)),
+          const SliverToBoxAdapter(child: SizedBox(height: 145)),
         ],
       ),
     );
@@ -356,9 +358,7 @@ class _DiscoverySheetState extends State<_DiscoverySheet> {
           ),
         ),
       ),
-      const SliverToBoxAdapter(child: SizedBox(height: 16)),
-      SliverToBoxAdapter(child: _SearchRow(onSearch: () => _showSearchSheet(context), onFilter: () => _showFilterSheet(context))),
-      const SliverToBoxAdapter(child: SizedBox(height: 14)),
+      const SliverToBoxAdapter(child: SizedBox(height: 12)),
       const SliverToBoxAdapter(child: _DividerLine()),
       SliverList(
         delegate: SliverChildBuilderDelegate(
@@ -385,7 +385,7 @@ class _DiscoverySheetState extends State<_DiscoverySheet> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Container(
-            height: 132,
+            height: 120,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -404,16 +404,16 @@ class _DiscoverySheetState extends State<_DiscoverySheet> {
             child: Row(
               children: [
                 Container(
-                  width: 82,
-                  height: 82,
+                  width: 72,
+                  height: 72,
                   decoration: BoxDecoration(
                     gradient: AppColors.orangeGradient,
-                    borderRadius: BorderRadius.circular(24),
+                    borderRadius: BorderRadius.circular(22),
                     boxShadow: [BoxShadow(color: AppColors.orange.withOpacity(.28), blurRadius: 18, offset: const Offset(0, 8))],
                   ),
                   child: const Icon(Icons.schedule_rounded, size: 34),
                 ),
-                const SizedBox(width: 14),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -421,7 +421,7 @@ class _DiscoverySheetState extends State<_DiscoverySheet> {
                     children: [
                       const Text('Next on SUN4U', style: TextStyle(color: AppColors.orange, fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: .35)),
                       const SizedBox(height: 6),
-                      Text(featured.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: -.35)),
+                      Text(featured.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, letterSpacing: -.35)),
                       const SizedBox(height: 4),
                       Text('${featured.time} · ${featured.host}', maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: AppColors.muted, fontSize: 11.5, fontWeight: FontWeight.w700)),
                       const SizedBox(height: 12),
@@ -447,9 +447,7 @@ class _DiscoverySheetState extends State<_DiscoverySheet> {
           ),
         ),
       ),
-      const SliverToBoxAdapter(child: SizedBox(height: 16)),
-      SliverToBoxAdapter(child: _SearchRow(onSearch: () => _showSearchSheet(context), onFilter: () => _showFilterSheet(context))),
-      const SliverToBoxAdapter(child: SizedBox(height: 14)),
+      const SliverToBoxAdapter(child: SizedBox(height: 12)),
       const SliverToBoxAdapter(child: _DividerLine()),
       SliverList(
         delegate: SliverChildBuilderDelegate(
@@ -497,10 +495,10 @@ class _PinnedTabsHeader extends SliverPersistentHeaderDelegate {
   final ValueChanged<int> onChanged;
 
   @override
-  double get minExtent => 54;
+  double get minExtent => 50;
 
   @override
-  double get maxExtent => 54;
+  double get maxExtent => 50;
 
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
@@ -553,7 +551,7 @@ class _SheetTabs extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Container(
-        height: 38,
+        height: 36,
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(.055),
@@ -647,68 +645,43 @@ class _PreviousTile extends StatelessWidget {
 }
 
 class _SearchRow extends StatelessWidget {
-  const _SearchRow({required this.onSearch, required this.onFilter});
+  const _SearchRow({required this.onSearch});
 
   final VoidCallback onSearch;
-  final VoidCallback onFilter;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Row(
-        children: [
-          Expanded(
-            child: InkWell(
-              borderRadius: BorderRadius.circular(24),
-              onTap: onSearch,
-              child: Container(
-                height: 52,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(.18),
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: Colors.white.withOpacity(.09)),
-                ),
-                child: Row(
-                  children: const [
-                    Icon(Icons.search_rounded, color: AppColors.muted, size: 20),
-                    SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        'Search shows, hosts, topics',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(color: AppColors.muted, fontSize: 13.5, fontWeight: FontWeight.w800),
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    Icon(Icons.tune_rounded, color: AppColors.dim, size: 18),
-                  ],
+      child: InkWell(
+        borderRadius: BorderRadius.circular(24),
+        onTap: onSearch,
+        child: Container(
+          height: 48,
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(.18),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: Colors.white.withOpacity(.09)),
+          ),
+          child: Row(
+            children: const [
+              Icon(Icons.search_rounded, color: AppColors.muted, size: 20),
+              SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'Search shows or topics',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: AppColors.muted, fontSize: 13.5, fontWeight: FontWeight.w800),
                 ),
               ),
-            ),
+              SizedBox(width: 8),
+              Icon(Icons.tune_rounded, color: AppColors.dim, size: 18),
+            ],
           ),
-          const SizedBox(width: 10),
-          InkWell(
-            customBorder: const CircleBorder(),
-            onTap: onFilter,
-            child: Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [Colors.white.withOpacity(.14), Colors.white.withOpacity(.06)],
-                ),
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white.withOpacity(.10)),
-              ),
-              child: const Icon(Icons.filter_alt_rounded, size: 20, color: Colors.white),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

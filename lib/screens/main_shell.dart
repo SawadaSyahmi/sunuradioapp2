@@ -58,8 +58,9 @@ class _BottomDock extends StatelessWidget {
 
     return SizedBox(
       width: double.infinity,
-      height: 106 + bottomInset,
+      height: 116 + bottomInset,
       child: Stack(
+        clipBehavior: Clip.none,
         alignment: Alignment.bottomCenter,
         children: [
           Positioned(
@@ -71,8 +72,8 @@ class _BottomDock extends StatelessWidget {
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
                 child: Container(
-                  height: 78 + bottomInset,
-                  padding: EdgeInsets.fromLTRB(24, 16, 24, bottomInset + 10),
+                  height: 72 + bottomInset,
+                  padding: EdgeInsets.fromLTRB(24, 13, 24, bottomInset + 8),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
@@ -120,7 +121,7 @@ class _BottomDock extends StatelessWidget {
             ),
           ),
           Positioned(
-            bottom: bottomInset + 14,
+            bottom: bottomInset + 12,
             child: _CenterPodcastButton(
               selected: selectedIndex == 1,
               onTap: () => onChanged(1),
@@ -148,8 +149,8 @@ class _CenterPodcastButton extends StatelessWidget {
           AnimatedContainer(
             duration: const Duration(milliseconds: 220),
             curve: Curves.easeOutCubic,
-            width: 76,
-            height: 76,
+            width: 70,
+            height: 70,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               gradient: selected
@@ -170,7 +171,7 @@ class _CenterPodcastButton extends StatelessWidget {
             ),
             child: Icon(
               Icons.podcasts_rounded,
-              size: 34,
+              size: 31,
               color: Colors.white.withOpacity(selected ? 1 : .92),
             ),
           ),
@@ -179,7 +180,7 @@ class _CenterPodcastButton extends StatelessWidget {
             'Podcast',
             style: TextStyle(
               color: Colors.white.withOpacity(selected ? 1 : .78),
-              fontSize: 13,
+              fontSize: 12,
               fontWeight: FontWeight.w900,
               letterSpacing: -.2,
             ),
@@ -215,13 +216,13 @@ class _SideNavItem extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 22, color: selected ? Colors.white : AppColors.muted),
+              Icon(icon, size: 21, color: selected ? Colors.white : AppColors.muted),
               const SizedBox(height: 5),
               Text(
                 label,
                 style: TextStyle(
                   color: selected ? Colors.white : AppColors.muted,
-                  fontSize: 12.5,
+                  fontSize: 11.5,
                   fontWeight: selected ? FontWeight.w900 : FontWeight.w800,
                   letterSpacing: -.1,
                 ),

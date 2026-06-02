@@ -17,7 +17,7 @@ class EventsScreen extends StatelessWidget {
       child: SafeArea(
         child: ListView(
           physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(18, 20, 18, 132),
+          padding: const EdgeInsets.fromLTRB(18, 20, 18, 122),
           children: [
             const Text('Events', style: TextStyle(fontSize: 34, fontWeight: FontWeight.w900, letterSpacing: -.8)),
             const SizedBox(height: 6),

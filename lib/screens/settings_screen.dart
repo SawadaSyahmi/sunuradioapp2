@@ -17,7 +17,7 @@ class SettingsScreen extends StatelessWidget {
         bottom: false,
         child: ListView(
           physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(20, 18, 20, 132),
+          padding: const EdgeInsets.fromLTRB(20, 18, 20, 122),
           children: [
             Row(
               children: const [
