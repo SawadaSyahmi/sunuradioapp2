@@ -8,6 +8,7 @@ import '../models/radio_models.dart';
 import '../widgets/figma_media.dart';
 import '../widgets/gradient_background.dart';
 import '../widgets/play_button.dart';
+import '../widgets/youtube_in_app_player.dart';
 
 class RadioScreen extends StatefulWidget {
   const RadioScreen({super.key});
@@ -486,7 +487,24 @@ class _PodcastListCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(episode.displayDateTime, style: const TextStyle(color: AppColors.royalBlue, fontSize: 8, fontWeight: FontWeight.w500)),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            episode.displayDateTime,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(color: AppColors.royalBlue, fontSize: 8, fontWeight: FontWeight.w500),
+                          ),
+                        ),
+                        if (episode.videoUrl.trim().isNotEmpty)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                            decoration: BoxDecoration(color: AppColors.orange, borderRadius: BorderRadius.circular(999)),
+                            child: const Text('VIDEO', style: TextStyle(color: Colors.white, fontSize: 7, fontWeight: FontWeight.w900)),
+                          ),
+                      ],
+                    ),
                     const SizedBox(height: 7),
                     Text(
                       episode.title,
@@ -594,7 +612,10 @@ class _PodcastDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final topHeight = math.min(MediaQuery.sizeOf(context).height * .43, 355.0);
+    final hasVideo = episode.videoUrl.trim().isNotEmpty;
+    final topHeight = hasVideo
+        ? MediaQuery.paddingOf(context).top + 278
+        : math.min(MediaQuery.sizeOf(context).height * .43, 355.0);
     final label = episode.isLive || episode.category.toLowerCase().contains('live') ? 'LIVE' : 'PODCAST';
 
     return Stack(
@@ -608,22 +629,31 @@ class _PodcastDetailPage extends StatelessWidget {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  FigmaMedia(
-                    imageUrl: episode.artworkUrl,
-                    title: episode.title,
-                    category: episode.category,
-                    icon: Icons.mic_none_rounded,
-                    showPlay: true,
-                  ),
-                  DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [Colors.transparent, AppColors.royalBlue.withOpacity(.94)],
+                  if (hasVideo)
+                    Container(
+                      color: Colors.black,
+                      alignment: Alignment.bottomCenter,
+                      padding: EdgeInsets.only(top: MediaQuery.paddingOf(context).top + 48),
+                      child: YouTubeInAppPlayer(videoUrl: episode.videoUrl),
+                    )
+                  else ...[
+                    FigmaMedia(
+                      imageUrl: episode.artworkUrl,
+                      title: episode.title,
+                      category: episode.category,
+                      icon: Icons.mic_none_rounded,
+                      showPlay: true,
+                    ),
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [Colors.transparent, AppColors.royalBlue.withOpacity(.94)],
+                        ),
                       ),
                     ),
-                  ),
+                  ],
                   Positioned(
                     left: 8,
                     top: MediaQuery.paddingOf(context).top + 8,
