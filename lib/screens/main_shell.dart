@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 import '../core/app_colors.dart';
@@ -88,7 +86,7 @@ class _BottomDock extends StatelessWidget {
 
     return SizedBox(
       width: double.infinity,
-      height: 116 + bottomInset,
+      height: 86 + bottomInset,
       child: Stack(
         clipBehavior: Clip.none,
         alignment: Alignment.bottomCenter,
@@ -97,61 +95,44 @@ class _BottomDock extends StatelessWidget {
             left: 0,
             right: 0,
             bottom: 0,
-            child: ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                child: Container(
-                  height: 72 + bottomInset,
-                  padding: EdgeInsets.fromLTRB(24, 13, 24, bottomInset + 8),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        const Color(0xEE130A24),
-                        AppColors.panel2.withOpacity(.96),
-                        const Color(0xEE4A278A),
-                      ],
-                    ),
-                    border: Border(
-                      top: BorderSide(color: Colors.white.withOpacity(.14)),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(.55),
-                        blurRadius: 26,
-                        offset: const Offset(0, -10),
-                      ),
-                    ],
+            child: Container(
+              height: 74 + bottomInset,
+              padding: EdgeInsets.fromLTRB(58, 9, 58, bottomInset + 8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(.13),
+                    blurRadius: 18,
+                    offset: const Offset(0, -7),
                   ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: _SideNavItem(
-                          icon: Icons.event_available_rounded,
-                          label: 'Events',
-                          selected: selectedIndex == 0,
-                          onTap: () => onChanged(0),
-                        ),
-                      ),
-                      const SizedBox(width: 98),
-                      Expanded(
-                        child: _SideNavItem(
-                          icon: Icons.settings_rounded,
-                          label: 'Settings',
-                          selected: selectedIndex == 2,
-                          onTap: () => onChanged(2),
-                        ),
-                      ),
-                    ],
+                ],
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _SideNavItem(
+                      icon: Icons.calendar_today_outlined,
+                      label: 'Events',
+                      selected: selectedIndex == 0,
+                      onTap: () => onChanged(0),
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 94),
+                  Expanded(
+                    child: _SideNavItem(
+                      icon: Icons.settings_outlined,
+                      label: 'Settings',
+                      selected: selectedIndex == 2,
+                      onTap: () => onChanged(2),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
           Positioned(
-            bottom: bottomInset + 12,
+            top: -2,
             child: _CenterPodcastButton(
               selected: selectedIndex == 1,
               onTap: () => onChanged(1),
@@ -173,49 +154,26 @@ class _CenterPodcastButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 220),
-            curve: Curves.easeOutCubic,
-            width: 70,
-            height: 70,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: selected
-                  ? AppColors.orangeGradient
-                  : LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [Colors.white.withOpacity(.18), Colors.white.withOpacity(.08)],
-                    ),
-              border: Border.all(color: Colors.white.withOpacity(selected ? .28 : .12), width: 1.2),
-              boxShadow: [
-                BoxShadow(
-                  color: (selected ? AppColors.orange : AppColors.purple).withOpacity(.28),
-                  blurRadius: 24,
-                  offset: const Offset(0, 10),
-                ),
-              ],
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeOutCubic,
+        width: 72,
+        height: 72,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: selected
+              ? AppColors.orangeGradient
+              : const LinearGradient(colors: [AppColors.orange2, AppColors.orange]),
+          border: Border.all(color: Colors.white, width: 4),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(.22),
+              blurRadius: 12,
+              offset: const Offset(0, 5),
             ),
-            child: Icon(
-              Icons.podcasts_rounded,
-              size: 31,
-              color: Colors.white.withOpacity(selected ? 1 : .92),
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            'Podcast',
-            style: TextStyle(
-              color: Colors.white.withOpacity(selected ? 1 : .78),
-              fontSize: 12,
-              fontWeight: FontWeight.w900,
-              letterSpacing: -.2,
-            ),
-          ),
-        ],
+          ],
+        ),
+        child: const Icon(Icons.mic_none_rounded, size: 38, color: Colors.white),
       ),
     );
   }
@@ -240,21 +198,20 @@ class _SideNavItem extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(18),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 2),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 21, color: selected ? Colors.white : AppColors.muted),
-              const SizedBox(height: 5),
+              Icon(icon, size: 24, color: selected ? AppColors.royalBlue : AppColors.muted),
+              const SizedBox(height: 4),
               Text(
                 label,
                 style: TextStyle(
-                  color: selected ? Colors.white : AppColors.muted,
-                  fontSize: 11.5,
-                  fontWeight: selected ? FontWeight.w900 : FontWeight.w800,
-                  letterSpacing: -.1,
+                  color: selected ? AppColors.royalBlue : AppColors.muted,
+                  fontSize: 10,
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
                 ),
               ),
             ],

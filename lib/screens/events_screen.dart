@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
+
 import '../core/app_colors.dart';
 import '../data/demo_data.dart';
 import '../models/radio_models.dart';
-import '../widgets/frosted_card.dart';
+import '../widgets/figma_media.dart';
 import '../widgets/gradient_background.dart';
-import '../widgets/section_header.dart';
-import '../widgets/status_pill.dart';
 import 'event_detail_screen.dart';
 
 class EventsScreen extends StatelessWidget {
@@ -15,177 +14,211 @@ class EventsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return GradientBackground(
       child: SafeArea(
+        bottom: false,
         child: ListView(
           physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(18, 20, 18, 122),
+          padding: const EdgeInsets.fromLTRB(36, 22, 0, 122),
           children: [
-            const Text('Events', style: TextStyle(fontSize: 34, fontWeight: FontWeight.w900, letterSpacing: -.8)),
-            const SizedBox(height: 6),
-            const Text('Discover campus events, RSVP, and set reminders.', style: TextStyle(color: AppColors.muted, height: 1.35)),
-            const SizedBox(height: 22),
-            _FeaturedEvent(
-              event: events.first,
-              onTap: () => Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => EventDetailScreen(event: events.first)),
+            const Padding(
+              padding: EdgeInsets.only(right: 36),
+              child: Text('Events', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+            ),
+            const SizedBox(height: 18),
+            SizedBox(
+              height: 200,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.only(right: 36),
+                itemCount: events.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 16),
+                itemBuilder: (context, index) {
+                  final event = events[index];
+                  return _EventHeroCard(
+                    event: event,
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => EventDetailScreen(event: event)),
+                    ),
+                  );
+                },
               ),
             ),
-            const SizedBox(height: 24),
-            const SectionHeader(title: 'Upcoming events', subtitle: 'Curated around music, podcasts, and campus life'),
-            const SizedBox(height: 12),
-            for (final event in events.skip(1))
-              _EventCard(
-                event: event,
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => EventDetailScreen(event: event)),
-                ),
+            const SizedBox(height: 9),
+            const Padding(padding: EdgeInsets.only(right: 36), child: _DotsIndicator()),
+            const SizedBox(height: 18),
+            Padding(
+              padding: const EdgeInsets.only(right: 36),
+              child: _SearchRow(onFilter: () => _toast(context, 'Filter coming soon')),
+            ),
+            const SizedBox(height: 18),
+            Padding(
+              padding: const EdgeInsets.only(right: 36),
+              child: Column(
+                children: [
+                  for (final event in events)
+                    _EventListCard(
+                      event: event,
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => EventDetailScreen(event: event)),
+                      ),
+                    ),
+                ],
               ),
+            ),
           ],
         ),
       ),
     );
   }
+
+  void _toast(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+  }
 }
 
-class _FeaturedEvent extends StatelessWidget {
-  const _FeaturedEvent({required this.event, required this.onTap});
+class _EventHeroCard extends StatelessWidget {
+  const _EventHeroCard({required this.event, required this.onTap});
 
   final CampusEvent event;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(34),
+    return GestureDetector(
+      onTap: onTap,
+      child: SizedBox(
+        width: 276,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: FigmaMedia(
+            imageUrl: event.artworkUrl,
+            title: event.title,
+            category: event.category,
+            icon: Icons.local_activity_rounded,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DotsIndicator extends StatelessWidget {
+  const _DotsIndicator();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(5, (index) {
+        return Container(
+          width: index == 0 ? 6 : 5,
+          height: index == 0 ? 6 : 5,
+          margin: const EdgeInsets.symmetric(horizontal: 3),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: index == 0 ? AppColors.orange : Colors.white.withOpacity(.82),
+          ),
+        );
+      }),
+    );
+  }
+}
+
+class _SearchRow extends StatelessWidget {
+  const _SearchRow({required this.onFilter});
+
+  final VoidCallback onFilter;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Container(
+            height: 40,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24)),
+            child: Row(
+              children: const [
+                Expanded(
+                  child: Text('Search', style: TextStyle(color: Color(0xFFC6C6C6), fontSize: 13, fontWeight: FontWeight.w400)),
+                ),
+                Icon(Icons.search_rounded, color: AppColors.royalBlue, size: 25),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        GestureDetector(
+          onTap: onFilter,
+          child: Container(
+            width: 42,
+            height: 42,
+            decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+            child: const Icon(Icons.tune_rounded, color: AppColors.royalBlue, size: 24),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _EventListCard extends StatelessWidget {
+  const _EventListCard({required this.event, required this.onTap});
+
+  final CampusEvent event;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 226,
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        gradient: AppColors.orangeGradient,
-        borderRadius: BorderRadius.circular(34),
-        border: Border.all(color: Colors.white.withOpacity(.10)),
-        boxShadow: [BoxShadow(color: AppColors.orange.withOpacity(.22), blurRadius: 30, offset: const Offset(0, 16))],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              StatusPill(label: event.date.toUpperCase(), foregroundColor: AppColors.bg, backgroundColor: AppColors.mint),
-              const SizedBox(width: 8),
-              StatusPill(label: event.category.toUpperCase(), icon: Icons.local_activity_rounded),
-            ],
-          ),
-          const Spacer(),
-          Text(event.title, style: const TextStyle(fontSize: 33, fontWeight: FontWeight.w900, height: .94, letterSpacing: -.9)),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              const Icon(Icons.place_rounded, size: 17, color: Colors.white70),
-              const SizedBox(width: 5),
-              Expanded(child: Text(event.venue, style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.w700))),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: FilledButton.icon(
-                  onPressed: () => _toast(context, 'RSVP saved for ${event.title}'),
-                  icon: const Icon(Icons.check_circle_rounded),
-                  label: const Text('RSVP'),
-                ),
-              ),
-              const SizedBox(width: 10),
-              IconButton.filledTonal(
-                onPressed: () => _toast(context, 'Reminder set for ${event.title}'),
-                icon: const Icon(Icons.notifications_active_rounded),
-              ),
-            ],
-          ),
-        ],
-      ),
-    ),
-  );
-  }
-
-  void _toast(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
-  }
-}
-
-class _EventCard extends StatelessWidget {
-  const _EventCard({required this.event, required this.onTap});
-
-  final CampusEvent event;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: FrostedCard(
-        onTap: onTap,
-        padding: const EdgeInsets.all(14),
+        height: 128,
+        margin: const EdgeInsets.only(bottom: 16),
+        decoration: BoxDecoration(color: AppColors.card, borderRadius: BorderRadius.circular(10)),
+        clipBehavior: Clip.antiAlias,
         child: Row(
           children: [
-            Container(
-              width: 78,
-              height: 88,
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                gradient: event.category == 'Music' ? AppColors.orangeGradient : AppColors.purpleGradient,
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(event.date.split(' ').first, style: const TextStyle(fontSize: 25, fontWeight: FontWeight.w900, height: .9)),
-                  const SizedBox(height: 4),
-                  Text(event.date.split(' ').length > 1 ? event.date.split(' ').last.toUpperCase() : '', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: Colors.white70)),
-                  const Spacer(),
-                  Icon(_iconForCategory(event.category), size: 19, color: Colors.white),
-                ],
+            SizedBox(
+              width: 128,
+              height: 128,
+              child: FigmaMedia(
+                imageUrl: event.imageUrl,
+                title: event.title,
+                category: event.category,
+                icon: Icons.local_activity_rounded,
               ),
             ),
-            const SizedBox(width: 14),
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(event.category.toUpperCase(), style: const TextStyle(color: AppColors.orange, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: .35)),
-                  const SizedBox(height: 5),
-                  Text(event.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w900, height: 1.12)),
-                  const SizedBox(height: 5),
-                  Text(event.venue, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: AppColors.muted, fontSize: 12)),
-                  const SizedBox(height: 8),
-                  Text(event.description, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: AppColors.muted, fontSize: 12, height: 1.3)),
-                ],
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(12, 15, 14, 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(event.date, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: AppColors.royalBlue, fontSize: 8, fontWeight: FontWeight.w500)),
+                    const Spacer(),
+                    Text(
+                      event.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(color: AppColors.navyText, fontSize: 19, height: .88, fontWeight: FontWeight.w900),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      'by ${event.organiser.isEmpty ? event.category : event.organiser}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(color: AppColors.navyText, fontSize: 8, fontWeight: FontWeight.w500),
+                    ),
+                    const Spacer(),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(width: 8),
-            IconButton(
-              onPressed: () => _toast(context, 'Reminder set for ${event.title}'),
-              icon: const Icon(Icons.notifications_none_rounded),
             ),
           ],
         ),
       ),
     );
-  }
-
-  IconData _iconForCategory(String category) {
-    switch (category) {
-      case 'Music':
-        return Icons.music_note_rounded;
-      case 'Podcast':
-        return Icons.podcasts_rounded;
-      default:
-        return Icons.auto_awesome_rounded;
-    }
-  }
-
-  void _toast(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 }
