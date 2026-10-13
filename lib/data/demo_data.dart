@@ -7,7 +7,7 @@ import '../services/supabase_config.dart';
 const fallbackAppConfig = AppConfig(
   stationName: 'SUN4U Radio',
   stationSubtitle: 'Campus radio, reimagined.',
-  liveStreamUrl: 'https://stream.live.vc.bbcmedia.co.uk/bbc_world_service',
+  liveStreamUrl: '',
   shareUrl: 'https://sunway.edu.my',
 );
 
@@ -70,48 +70,48 @@ const fallbackSchedule = <RadioShow>[
 
 const fallbackPodcasts = <PodcastEpisode>[
   PodcastEpisode(
-    title: 'Sun4U S3 E15: Anxiety Free x Stressless Sunway',
-    host: 'Sun4U Radio',
-    date: 'Sample Previous Video',
-    duration: 'YouTube',
+    title: 'Sun4U Radio Open Day Special! (Day 1)',
+    host: 'Student Leadership Body',
+    date: '11 March 2026',
+    duration: '1hr 30mins',
     category: 'Podcast',
-    videoUrl: 'https://www.youtube.com/watch?v=wxFxDoo-v1c',
-    imageUrl: 'https://img.youtube.com/vi/wxFxDoo-v1c/hqdefault.jpg',
-    heroImageUrl: 'https://img.youtube.com/vi/wxFxDoo-v1c/maxresdefault.jpg',
-    description: 'Sample previous podcast video loaded from the database. Replace this YouTube link with your own SUN4U recorded content later.',
+    description: sun4UOpenDayDescription,
   ),
   PodcastEpisode(
-    title: 'Sun4U S3 E8: Hobbies',
-    host: 'Sun4U Radio',
-    date: 'Sample Previous Video',
-    duration: 'YouTube',
-    category: 'Podcast',
-    videoUrl: 'https://www.youtube.com/watch?v=3KPFr4IIgt8',
-    imageUrl: 'https://img.youtube.com/vi/3KPFr4IIgt8/hqdefault.jpg',
-    heroImageUrl: 'https://img.youtube.com/vi/3KPFr4IIgt8/maxresdefault.jpg',
-    description: 'Sample previous podcast episode connected through video_url in Supabase.',
+    title: 'Sun4U Radio Open Day Special! (Day 2)',
+    host: 'Student Leadership Body',
+    date: '12 March 2026',
+    duration: '1hr 30mins',
+    category: 'Live',
+    isLive: true,
+    description: sun4UOpenDayDescription,
   ),
   PodcastEpisode(
-    title: 'Sun4U S1 E3: Introspection - Diving into personality traits',
-    host: 'Sun4U Radio',
-    date: 'Sample Previous Video',
-    duration: 'YouTube',
-    category: 'Podcast',
-    videoUrl: 'https://www.youtube.com/watch?v=Wva_8fVLSVA',
-    imageUrl: 'https://img.youtube.com/vi/Wva_8fVLSVA/hqdefault.jpg',
-    heroImageUrl: 'https://img.youtube.com/vi/Wva_8fVLSVA/maxresdefault.jpg',
-    description: 'Sample recorded Sun4U radio content for testing the in-app YouTube player.',
+    title: 'Special Episode: The Game of Impossible',
+    host: 'Prof. Dato\' Sri Idris Jala, Datuk Dr. Nicol David, and Leon Jala',
+    date: '12 June 2026, Friday',
+    time: '12:00PM',
+    duration: '50 min',
+    category: 'Upcoming',
+    description: 'A special campus conversation on impossible goals, leadership, and resilience.',
   ),
   PodcastEpisode(
-    title: 'Sun4U S1 E8: The Vegan Student',
-    host: 'Sun4U Radio',
-    date: 'Sample Previous Video',
-    duration: 'YouTube',
-    category: 'Podcast',
-    videoUrl: 'https://www.youtube.com/watch?v=Js_vnSLzN1w',
-    imageUrl: 'https://img.youtube.com/vi/Js_vnSLzN1w/hqdefault.jpg',
-    heroImageUrl: 'https://img.youtube.com/vi/Js_vnSLzN1w/maxresdefault.jpg',
-    description: 'Sample previous podcast episode loaded from Supabase and playable inside the app.',
+    title: 'Cuppa Coffee EP10',
+    host: 'Prof. Dato\' Elizabeth Lee',
+    date: '19 June 2026, Friday',
+    time: '12:00PM',
+    duration: '45 min',
+    category: 'Upcoming',
+    description: 'A relaxed conversation over coffee with Sunway leaders and guests.',
+  ),
+  PodcastEpisode(
+    title: 'Emcee Workshop EP1',
+    host: 'Sunway Student Experience Team',
+    date: '23 June 2026, Tuesday',
+    time: '12:00PM',
+    duration: '30 min',
+    category: 'Upcoming',
+    description: 'A workshop recap for emcees and student hosts.',
   ),
 ];
 
@@ -182,8 +182,8 @@ String? sun4ULastLoadError;
 Future<bool> loadSun4UDataFromSupabase({bool notify = true}) async {
   if (!SupabaseConfig.isConfigured) {
     sun4ULoadedFromSupabase = false;
-    sun4ULastLoadError = 'Supabase is not configured. Check SupabaseConfig.url and anonKey.';
-    debugPrint('SUN4U Supabase is not configured. Using local demo data.');
+    sun4ULastLoadError = 'Supabase is not configured for this build.';
+    if (kDebugMode) debugPrint('SUN4U Supabase is not configured. Using local demo data.');
     if (notify) sun4UDataVersion.value++;
     return false;
   }
@@ -203,13 +203,15 @@ Future<bool> loadSun4UDataFromSupabase({bool notify = true}) async {
     sun4ULoadedFromSupabase = true;
     sun4ULastLoadError = null;
     if (notify) sun4UDataVersion.value++;
-    debugPrint('SUN4U Supabase data loaded: ${schedule.length} shows, ${podcasts.length} podcasts, ${events.length} events.');
+    if (kDebugMode) debugPrint('SUN4U Supabase data loaded: ${schedule.length} shows, ${podcasts.length} podcasts, ${events.length} events.');
     return true;
   } on Object catch (error, stackTrace) {
     sun4ULoadedFromSupabase = false;
     sun4ULastLoadError = error.toString();
-    debugPrint('Failed to load SUN4U Supabase data: $error');
-    debugPrint('$stackTrace');
+    if (kDebugMode) {
+      debugPrint('Failed to load SUN4U Supabase data: $error');
+      debugPrint('$stackTrace');
+    }
     if (notify) sun4UDataVersion.value++;
     return false;
   }

@@ -1,34 +1,37 @@
+/// Build-time configuration for Supabase.
+///
+/// Pass values with Flutter's --dart-define or --dart-define-from-file.
+/// The publishable key is intentionally a client key; it is NOT a server secret.
+/// Database security must be enforced with Row Level Security (RLS).
 class SupabaseConfig {
   const SupabaseConfig._();
 
-  /// Copy this from Supabase Dashboard > Project Settings > Data API.
-  /// Use the Project URL only, for example:
-  /// https://your-project-ref.supabase.co
-  ///
-  /// Do NOT use the REST endpoint /rest/v1/ here.
-  static const String url = 'bvdrpfdmdsikeyzbqxpl.supabase.co/rest/v1/';
+  static const String url = String.fromEnvironment('SUPABASE_URL');
 
-  /// Keep the service role key OUT of the Flutter app.
-  /// Use only the anon/public/publishable key here.
-  static const String anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ2ZHJwZmRtZHNpa2V5emJxeHBsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzNzczNzAsImV4cCI6MjA5NTk1MzM3MH0.GYC5z93-amKXijXx9ovNJb0GAybrghDjtMLUbi5WXoA';
+  /// Use the Supabase publishable/client key only.
+  /// Never place a service_role/secret key in a mobile app.
+  static const String publishableKey = String.fromEnvironment('SUPABASE_PUBLISHABLE_KEY');
 
-  /// Accepts the correct Project URL and also fixes the common mistake of
-  /// pasting "project.supabase.co/rest/v1/" from the API docs.
+  /// Compatibility with older Supabase projects/tooling that still labels the
+  /// client key as an anon key. This is still a public client credential.
+  static const String legacyAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
+
+  static String get clientKey => publishableKey.trim().isNotEmpty ? publishableKey.trim() : legacyAnonKey.trim();
+
   static String get projectUrl {
     var value = url.trim();
-    if (value.endsWith('/')) value = value.substring(0, value.length - 1);
-    value = value.replaceAll('/rest/v1', '');
-    if (value.isNotEmpty && !value.startsWith('http://') && !value.startsWith('https://')) {
-      value = 'https://$value';
+    while (value.endsWith('/')) {
+      value = value.substring(0, value.length - 1);
     }
+    value = value.replaceAll('/rest/v1', '');
     return value;
   }
 
   static bool get isConfigured {
-    return projectUrl.startsWith('https://') &&
-        projectUrl.contains('.supabase.co') &&
-        !projectUrl.contains('YOUR_SUPABASE') &&
-        anonKey.trim().isNotEmpty &&
-        !anonKey.contains('YOUR_SUPABASE');
+    final uri = Uri.tryParse(projectUrl);
+    return uri != null &&
+        uri.scheme == 'https' &&
+        uri.host.endsWith('.supabase.co') &&
+        clientKey.isNotEmpty;
   }
 }

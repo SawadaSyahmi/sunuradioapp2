@@ -31,111 +31,75 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      loadSun4UDataFromSupabase();
-    }
-  }
-
-  List<Widget> _buildScreens(int version) {
-    return <Widget>[
-      EventsScreen(key: ValueKey('events_$version')),
-      RadioScreen(key: ValueKey('radio_$version')),
-      SettingsScreen(key: ValueKey('settings_$version')),
-    ];
+    if (state == AppLifecycleState.resumed) loadSun4UDataFromSupabase();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBody: true,
       resizeToAvoidBottomInset: false,
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: ValueListenableBuilder<int>(
-              valueListenable: sun4UDataVersion,
-              builder: (context, version, _) {
-                return IndexedStack(index: _index, children: _buildScreens(version));
-              },
-            ),
-          ),
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: _BottomDock(
-              selectedIndex: _index,
-              onChanged: (value) => setState(() => _index = value),
-            ),
-          ),
-        ],
+      extendBody: true,
+      body: ValueListenableBuilder<int>(
+        valueListenable: sun4UDataVersion,
+        builder: (context, version, _) {
+          return IndexedStack(
+            index: _index,
+            children: [
+              EventsScreen(key: ValueKey('events_$version')),
+              RadioScreen(key: ValueKey('home_$version')),
+              SettingsScreen(key: ValueKey('settings_$version')),
+            ],
+          );
+        },
+      ),
+      bottomNavigationBar: _Sun4UNavigationBar(
+        selectedIndex: _index,
+        onChanged: (value) => setState(() => _index = value),
       ),
     );
   }
 }
 
-class _BottomDock extends StatelessWidget {
-  const _BottomDock({required this.selectedIndex, required this.onChanged});
+class _Sun4UNavigationBar extends StatelessWidget {
+  const _Sun4UNavigationBar({required this.selectedIndex, required this.onChanged});
 
   final int selectedIndex;
   final ValueChanged<int> onChanged;
 
   @override
   Widget build(BuildContext context) {
-    final bottomInset = MediaQuery.paddingOf(context).bottom;
-
-    return SizedBox(
-      width: double.infinity,
-      height: 86 + bottomInset,
-      child: Stack(
-        clipBehavior: Clip.none,
-        alignment: Alignment.bottomCenter,
+    final bottom = MediaQuery.paddingOf(context).bottom;
+    return Container(
+      height: 76 + bottom,
+      padding: EdgeInsets.only(bottom: bottom),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(.08), blurRadius: 16, offset: const Offset(0, -3)),
+        ],
+      ),
+      child: Row(
         children: [
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: Container(
-              height: 74 + bottomInset,
-              padding: EdgeInsets.fromLTRB(58, 9, 58, bottomInset + 8),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(.13),
-                    blurRadius: 18,
-                    offset: const Offset(0, -7),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: _SideNavItem(
-                      icon: Icons.calendar_today_outlined,
-                      label: 'Events',
-                      selected: selectedIndex == 0,
-                      onTap: () => onChanged(0),
-                    ),
-                  ),
-                  const SizedBox(width: 94),
-                  Expanded(
-                    child: _SideNavItem(
-                      icon: Icons.settings_outlined,
-                      label: 'Settings',
-                      selected: selectedIndex == 2,
-                      onTap: () => onChanged(2),
-                    ),
-                  ),
-                ],
-              ),
+          Expanded(
+            child: _NavItem(
+              icon: Icons.event_note_outlined,
+              label: 'Events',
+              selected: selectedIndex == 0,
+              onTap: () => onChanged(0),
             ),
           ),
-          Positioned(
-            top: -2,
-            child: _CenterPodcastButton(
+          Expanded(
+            child: _HomeNavItem(
               selected: selectedIndex == 1,
               onTap: () => onChanged(1),
+            ),
+          ),
+          Expanded(
+            child: _NavItem(
+              icon: Icons.settings_outlined,
+              label: 'Settings',
+              selected: selectedIndex == 2,
+              onTap: () => onChanged(2),
             ),
           ),
         ],
@@ -144,48 +108,8 @@ class _BottomDock extends StatelessWidget {
   }
 }
 
-class _CenterPodcastButton extends StatelessWidget {
-  const _CenterPodcastButton({required this.selected, required this.onTap});
-
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 220),
-        curve: Curves.easeOutCubic,
-        width: 72,
-        height: 72,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          gradient: selected
-              ? AppColors.orangeGradient
-              : const LinearGradient(colors: [AppColors.orange2, AppColors.orange]),
-          border: Border.all(color: Colors.white, width: 4),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(.22),
-              blurRadius: 12,
-              offset: const Offset(0, 5),
-            ),
-          ],
-        ),
-        child: const Icon(Icons.mic_none_rounded, size: 38, color: Colors.white),
-      ),
-    );
-  }
-}
-
-class _SideNavItem extends StatelessWidget {
-  const _SideNavItem({
-    required this.icon,
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
+class _NavItem extends StatelessWidget {
+  const _NavItem({required this.icon, required this.label, required this.selected, required this.onTap});
 
   final IconData icon;
   final String label;
@@ -194,29 +118,54 @@ class _SideNavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(18),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 2),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, size: 24, color: selected ? AppColors.royalBlue : AppColors.muted),
-              const SizedBox(height: 4),
-              Text(
-                label,
-                style: TextStyle(
-                  color: selected ? AppColors.royalBlue : AppColors.muted,
-                  fontSize: 10,
-                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                ),
-              ),
-            ],
+    final color = selected ? AppColors.orange : const Color(0xFFB0B0B0);
+    return InkWell(
+      onTap: onTap,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: color, size: 25),
+          const SizedBox(height: 3),
+          Text(label, style: TextStyle(color: color, fontSize: 9, fontWeight: FontWeight.w500)),
+        ],
+      ),
+    );
+  }
+}
+
+class _HomeNavItem extends StatelessWidget {
+  const _HomeNavItem({required this.selected, required this.onTap});
+
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 46,
+            height: 46,
+            decoration: BoxDecoration(
+              color: AppColors.orange,
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white, width: 3),
+            ),
+            child: const Icon(Icons.home_outlined, color: Colors.white, size: 28),
           ),
-        ),
+          const SizedBox(height: 1),
+          Text(
+            'Home',
+            style: TextStyle(
+              color: selected ? AppColors.orange : const Color(0xFF9F9F9F),
+              fontSize: 9,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
       ),
     );
   }
