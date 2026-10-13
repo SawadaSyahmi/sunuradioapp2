@@ -1,55 +1,54 @@
 import 'package:flutter/material.dart';
-import '../core/app_colors.dart';
+
+enum AppLogoVariant { white, colour, black }
 
 class AppLogo extends StatelessWidget {
-  const AppLogo({super.key, this.compact = false});
+  const AppLogo({
+    super.key,
+    this.compact = false,
+    this.variant = AppLogoVariant.white,
+    this.width,
+  });
 
   final bool compact;
+  final AppLogoVariant variant;
+  final double? width;
+
+  String get _assetPath {
+    switch (variant) {
+      case AppLogoVariant.black:
+        return 'assets/branding/sun4u_logo_black.png';
+      case AppLogoVariant.colour:
+        return 'assets/branding/sun4u_logo_colour.png';
+      case AppLogoVariant.white:
+        return 'assets/branding/sun4u_logo_white.png';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final size = compact ? 18.0 : 32.0;
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          'SUN',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: size,
-            fontWeight: FontWeight.w900,
-            letterSpacing: -1,
-          ),
-        ),
-        Text(
-          '4',
-          style: TextStyle(
-            color: AppColors.orange,
-            fontSize: size + 2,
-            fontWeight: FontWeight.w900,
-            letterSpacing: -1,
-          ),
-        ),
-        Text(
-          'U',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: size,
-            fontWeight: FontWeight.w900,
-            letterSpacing: -1,
-          ),
-        ),
-        const SizedBox(width: 5),
-        Text(
-          'RADIO',
-          style: TextStyle(
-            color: compact ? AppColors.orange : Colors.white,
-            fontSize: compact ? 7 : 12,
-            fontWeight: FontWeight.w900,
-            height: .9,
-          ),
-        ),
-      ],
+    final logoWidth = width ?? (compact ? 82.0 : 180.0);
+
+    return Semantics(
+      label: 'SUN4U Radio',
+      image: true,
+      child: Image.asset(
+        _assetPath,
+        width: logoWidth,
+        fit: BoxFit.contain,
+        filterQuality: FilterQuality.high,
+        errorBuilder: (context, error, stackTrace) {
+          return Text(
+            'SUN4U RADIO',
+            style: TextStyle(
+              color: variant == AppLogoVariant.black ? Colors.black : Colors.white,
+              fontSize: compact ? 14 : 24,
+              fontWeight: FontWeight.w900,
+              letterSpacing: -.6,
+            ),
+          );
+        },
+      ),
     );
   }
 }

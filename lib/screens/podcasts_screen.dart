@@ -5,7 +5,7 @@ import '../models/radio_models.dart';
 import '../widgets/frosted_card.dart';
 import '../widgets/gradient_background.dart';
 import '../widgets/section_header.dart';
-import '../widgets/show_artwork.dart';
+import '../widgets/figma_media.dart';
 import '../widgets/status_pill.dart';
 import 'episode_detail_screen.dart';
 
@@ -92,10 +92,17 @@ class _FeaturedPodcast extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 16),
-            const SizedBox(
+            SizedBox(
               width: 104,
               height: 142,
-              child: ShowArtwork(borderRadius: 28, icon: Icons.mic_external_on_rounded, showLogo: false),
+              child: FigmaMedia(
+                imageUrl: episode.artworkUrl,
+                title: episode.title,
+                category: episode.category,
+                icon: episode.hasVideo ? Icons.play_circle_fill_rounded : Icons.mic_external_on_rounded,
+                borderRadius: 28,
+                showPlay: episode.hasVideo,
+              ),
             ),
           ],
         ),
@@ -148,14 +155,25 @@ class _EpisodeCard extends StatelessWidget {
         padding: const EdgeInsets.all(14),
         child: Row(
           children: [
-            Container(
+            SizedBox(
               width: 70,
               height: 70,
-              decoration: BoxDecoration(
-                gradient: episode.category == 'Research' ? AppColors.tealGradient : AppColors.orangeGradient,
-                borderRadius: BorderRadius.circular(22),
-              ),
-              child: Icon(_iconForCategory(episode.category), color: Colors.white, size: 30),
+              child: episode.artworkUrl.isNotEmpty
+                  ? FigmaMedia(
+                      imageUrl: episode.artworkUrl,
+                      title: episode.title,
+                      category: episode.category,
+                      icon: _iconForCategory(episode.category),
+                      borderRadius: 22,
+                      showPlay: episode.hasVideo,
+                    )
+                  : Container(
+                      decoration: BoxDecoration(
+                        gradient: episode.category == 'Research' ? AppColors.tealGradient : AppColors.orangeGradient,
+                        borderRadius: BorderRadius.circular(22),
+                      ),
+                      child: Icon(_iconForCategory(episode.category), color: Colors.white, size: 30),
+                    ),
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -175,7 +193,7 @@ class _EpisodeCard extends StatelessWidget {
               width: 36,
               height: 36,
               decoration: BoxDecoration(color: Colors.white.withOpacity(.07), shape: BoxShape.circle),
-              child: const Icon(Icons.chevron_right_rounded, color: AppColors.muted),
+              child: Icon(episode.hasVideo ? Icons.play_arrow_rounded : Icons.chevron_right_rounded, color: episode.hasVideo ? AppColors.orange : AppColors.muted),
             ),
           ],
         ),

@@ -6,3 +6,12 @@ build/
 .pub-cache/
 .pub/
 coverage/
+
+# SUN4U local/prod build configuration and signing material
+deployment/env/prod.json
+android/key.properties
+android/*.jks
+android/*.keystore
+*.p12
+*.mobileprovision
+build/symbols/

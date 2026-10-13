@@ -1,10 +1,12 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
 import '../core/app_colors.dart';
 import '../services/safe_url.dart';
+import '../widgets/youtube_in_app_player.dart' show YouTubeUrlParser;
 
 class AdaptiveVideoPlayerScreen extends StatelessWidget {
   const AdaptiveVideoPlayerScreen({
@@ -27,7 +29,7 @@ class AdaptiveVideoPlayerScreen extends StatelessWidget {
       return _InvalidVideoPage(title: title);
     }
     final safeUrl = safeUri.toString();
-    final youtubeId = SafeUrl.isYoutube(safeUrl) ? YoutubePlayer.convertUrlToId(safeUrl) : null;
+    final youtubeId = SafeUrl.isYoutube(safeUrl) ? YouTubeUrlParser.videoIdFromUrl(safeUrl) : null;
     if (youtubeId != null && youtubeId.isNotEmpty) {
       return _YoutubeVideoPage(
         videoId: youtubeId,
@@ -69,7 +71,11 @@ class _InvalidVideoPage extends StatelessWidget {
 }
 
 class _YoutubeVideoPage extends StatefulWidget {
-  const _YoutubeVideoPage({required this.videoId, required this.title, required this.subtitle});
+  const _YoutubeVideoPage({
+    required this.videoId,
+    required this.title,
+    required this.subtitle,
+  });
 
   final String videoId;
   final String title;
@@ -85,53 +91,54 @@ class _YoutubeVideoPageState extends State<_YoutubeVideoPage> {
   @override
   void initState() {
     super.initState();
-    _controller = YoutubePlayerController(
-      initialVideoId: widget.videoId,
-      flags: const YoutubePlayerFlags(
-        autoPlay: true,
-        mute: false,
+    _controller = YoutubePlayerController.fromVideoId(
+      videoId: widget.videoId,
+      autoPlay: true,
+      params: const YoutubePlayerParams(
+        showControls: true,
+        showFullscreenButton: true,
         enableCaption: true,
-        forceHD: false,
+        playsInline: true,
+        strictRelatedVideos: true,
       ),
     );
   }
 
   @override
   void dispose() {
-    _controller.dispose();
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-    SystemChrome.setPreferredOrientations(const [DeviceOrientation.portraitUp]);
+    _controller.close();
+    // The iframe player manages fullscreen itself. Resetting the mobile app
+    // orientation here keeps the rest of SUN4U portrait-first after exit.
+    if (!kIsWeb) {
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+      SystemChrome.setPreferredOrientations(const [DeviceOrientation.portraitUp]);
+    }
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return YoutubePlayerBuilder(
-      onEnterFullScreen: () {
-        SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-        SystemChrome.setPreferredOrientations(const [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
-      },
-      onExitFullScreen: () {
-        SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-        SystemChrome.setPreferredOrientations(const [DeviceOrientation.portraitUp]);
-      },
-      player: YoutubePlayer(
-        controller: _controller,
-        showVideoProgressIndicator: true,
-        progressIndicatorColor: AppColors.orange,
-        progressColors: const ProgressBarColors(
-          playedColor: AppColors.orange,
-          handleColor: AppColors.orange,
-        ),
-      ),
+    return YoutubePlayerScaffold(
+      controller: _controller,
+      aspectRatio: 16 / 9,
+      backgroundColor: Colors.black,
+      fullscreenOrientations: const [
+        DeviceOrientation.landscapeLeft,
+        DeviceOrientation.landscapeRight,
+      ],
+      lockedOrientations: const [DeviceOrientation.portraitUp],
       builder: (context, player) {
         return Scaffold(
           backgroundColor: const Color(0xFF050505),
           body: OrientationBuilder(
             builder: (context, orientation) {
-              if (orientation == Orientation.landscape) {
-                return Center(child: player);
+              // A normal desktop browser is usually landscape-shaped. Do not
+              // mistake that for fullscreen; keep the title/details visible.
+              final mobileLandscape = !kIsWeb && orientation == Orientation.landscape;
+              if (mobileLandscape) {
+                return SafeArea(child: Center(child: player));
               }
+
               return _PortraitVideoLayout(
                 title: widget.title,
                 subtitle: widget.subtitle,

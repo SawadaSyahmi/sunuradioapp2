@@ -1,0 +1,7 @@
+# Never commit signing material or environment-specific build config.
+deployment/env/prod.json
+android/key.properties
+android/*.jks
+android/*.keystore
+*.p12
+*.mobileprovision

@@ -1,0 +1,11 @@
+Run from the Flutter project root:
+
+flutter pub add supabase_flutter
+flutter pub add just_audio
+flutter pub add just_audio_background
+flutter pub add audio_service
+flutter pub add shared_preferences
+flutter pub add video_player
+flutter pub add youtube_player_flutter
+flutter pub add url_launcher
+flutter pub get

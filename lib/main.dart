@@ -20,11 +20,26 @@ Future<void> main() async {
   );
 
   if (SupabaseConfig.isConfigured) {
-    await Supabase.initialize(
-      url: SupabaseConfig.projectUrl,
-      anonKey: SupabaseConfig.clientKey,
-    );
-    await loadSun4UDataFromSupabase();
+    try {
+      await Supabase.initialize(
+        url: SupabaseConfig.projectUrl,
+        anonKey: SupabaseConfig.clientKey,
+      );
+      if (kDebugMode) {
+        debugPrint(
+          'SUN4U Supabase initialized using '
+          '${SupabaseConfig.usesBuildTimeOverride ? 'build-time configuration' : 'project fallback configuration'}.',
+        );
+      }
+      await loadSun4UDataFromSupabase();
+    } on Object catch (error, stackTrace) {
+      if (kDebugMode) {
+        debugPrint('SUN4U Supabase initialization failed. Using local demo data: $error');
+        debugPrint('$stackTrace');
+      }
+    }
+  } else if (kDebugMode) {
+    debugPrint('SUN4U Supabase configuration is invalid. Using local demo data.');
   }
 
   runApp(

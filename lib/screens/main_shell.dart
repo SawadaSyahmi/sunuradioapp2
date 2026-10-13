@@ -20,7 +20,9 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    loadSun4UDataFromSupabase();
+    if (!sun4ULoadedFromSupabase) {
+      loadSun4UDataFromSupabase();
+    }
   }
 
   @override
@@ -61,45 +63,72 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
 }
 
 class _Sun4UNavigationBar extends StatelessWidget {
-  const _Sun4UNavigationBar({required this.selectedIndex, required this.onChanged});
+  const _Sun4UNavigationBar({
+    required this.selectedIndex,
+    required this.onChanged,
+  });
 
   final int selectedIndex;
   final ValueChanged<int> onChanged;
 
   @override
   Widget build(BuildContext context) {
-    final bottom = MediaQuery.paddingOf(context).bottom;
-    return Container(
-      height: 76 + bottom,
-      padding: EdgeInsets.only(bottom: bottom),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(.08), blurRadius: 16, offset: const Offset(0, -3)),
-        ],
-      ),
-      child: Row(
+    final safeBottom = MediaQuery.paddingOf(context).bottom;
+
+    return SizedBox(
+      height: 82 + safeBottom,
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.topCenter,
         children: [
-          Expanded(
-            child: _NavItem(
-              icon: Icons.event_note_outlined,
-              label: 'Events',
-              selected: selectedIndex == 0,
-              onTap: () => onChanged(0),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Container(
+              height: 70 + safeBottom,
+              padding: EdgeInsets.only(bottom: safeBottom),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: const Border(
+                  top: BorderSide(color: Color(0xFFE9E9E9), width: .8),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(.055),
+                    blurRadius: 14,
+                    offset: const Offset(0, -2),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _NavItem(
+                      icon: Icons.event_note_outlined,
+                      label: 'Events',
+                      selected: selectedIndex == 0,
+                      onTap: () => onChanged(0),
+                    ),
+                  ),
+                  const Expanded(child: SizedBox()),
+                  Expanded(
+                    child: _NavItem(
+                      icon: Icons.settings_outlined,
+                      label: 'Settings',
+                      selected: selectedIndex == 2,
+                      onTap: () => onChanged(2),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-          Expanded(
+          Positioned(
+            top: 0,
             child: _HomeNavItem(
               selected: selectedIndex == 1,
               onTap: () => onChanged(1),
-            ),
-          ),
-          Expanded(
-            child: _NavItem(
-              icon: Icons.settings_outlined,
-              label: 'Settings',
-              selected: selectedIndex == 2,
-              onTap: () => onChanged(2),
             ),
           ),
         ],
@@ -109,7 +138,12 @@ class _Sun4UNavigationBar extends StatelessWidget {
 }
 
 class _NavItem extends StatelessWidget {
-  const _NavItem({required this.icon, required this.label, required this.selected, required this.onTap});
+  const _NavItem({
+    required this.icon,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
 
   final IconData icon;
   final String label;
@@ -118,54 +152,103 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = selected ? AppColors.orange : const Color(0xFFB0B0B0);
-    return InkWell(
-      onTap: onTap,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, color: color, size: 25),
-          const SizedBox(height: 3),
-          Text(label, style: TextStyle(color: color, fontSize: 9, fontWeight: FontWeight.w500)),
-        ],
+    final color = selected ? AppColors.orange : const Color(0xFFA8A8A8);
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        child: Semantics(
+          button: true,
+          selected: selected,
+          label: label,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 9),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon, color: color, size: 26),
+                const SizedBox(height: 3),
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: color,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
 }
 
 class _HomeNavItem extends StatelessWidget {
-  const _HomeNavItem({required this.selected, required this.onTap});
+  const _HomeNavItem({
+    required this.selected,
+    required this.onTap,
+  });
 
   final bool selected;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 46,
-            height: 46,
-            decoration: BoxDecoration(
-              color: AppColors.orange,
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.white, width: 3),
-            ),
-            child: const Icon(Icons.home_outlined, color: Colors.white, size: 28),
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: 'Home',
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: SizedBox(
+          width: 104,
+          height: 72,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 58,
+                height: 58,
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(.12),
+                      blurRadius: 10,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Container(
+                  decoration: const BoxDecoration(
+                    color: AppColors.orange,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.home_outlined,
+                    color: Colors.white,
+                    size: 30,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 1),
+              const Text(
+                'Home',
+                style: TextStyle(
+                  color: Color(0xFF9E9E9E),
+                  fontSize: 10,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 1),
-          Text(
-            'Home',
-            style: TextStyle(
-              color: selected ? AppColors.orange : const Color(0xFF9F9F9F),
-              fontSize: 9,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

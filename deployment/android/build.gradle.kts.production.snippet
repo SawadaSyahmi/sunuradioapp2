@@ -1,0 +1,18 @@
+// android/app/build.gradle.kts
+android {
+    // Google Play requires API 36 for new apps/updates from 31 Aug 2026.
+    compileSdk = 36
+
+    defaultConfig {
+        targetSdk = 36
+        // Keep your existing minSdk if it is already >= 21.
+    }
+
+    buildTypes {
+        release {
+            // Configure your release signingConfig here; never commit key passwords.
+            isMinifyEnabled = true
+            isShrinkResources = true
+        }
+    }
+}

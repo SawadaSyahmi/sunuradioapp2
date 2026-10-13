@@ -68,7 +68,42 @@ const fallbackSchedule = <RadioShow>[
   ),
 ];
 
+const sun4USampleVideos = <PodcastEpisode>[
+  PodcastEpisode(
+    title: 'Sun4U Official – Featured Video',
+    host: 'Sun4U Official',
+    date: 'Sample video',
+    duration: 'Video',
+    category: 'Video',
+    description:
+        'A sample video from the Sun4U Official YouTube channel. It plays inside the SUN4U app with portrait and landscape/full-screen support.',
+    imageUrl: 'https://img.youtube.com/vi/GFNfPTjij9w/hqdefault.jpg',
+    heroImageUrl: 'https://img.youtube.com/vi/GFNfPTjij9w/hqdefault.jpg',
+    videoUrl: 'https://www.youtube.com/watch?v=GFNfPTjij9w',
+    seriesName: 'Sun4U Official',
+    status: 'passed',
+    mediaType: 'video',
+    isFeatured: true,
+  ),
+  PodcastEpisode(
+    title: 'Sun4U Open Day Special! (Day 2)',
+    host: 'Sun4U Official',
+    date: '11 April 2026',
+    duration: 'Video',
+    category: 'Open Day',
+    description:
+        'Sun4U Radio returns for a special Sunway University Open Day broadcast featuring campus interviews and student voices.',
+    imageUrl: 'https://img.youtube.com/vi/YCc_WbzbGLM/hqdefault.jpg',
+    heroImageUrl: 'https://img.youtube.com/vi/YCc_WbzbGLM/hqdefault.jpg',
+    videoUrl: 'https://www.youtube.com/watch?v=YCc_WbzbGLM',
+    seriesName: 'Sun4U Open Day Special',
+    status: 'passed',
+    mediaType: 'video',
+  ),
+];
+
 const fallbackPodcasts = <PodcastEpisode>[
+  ...sun4USampleVideos,
   PodcastEpisode(
     title: 'Sun4U Radio Open Day Special! (Day 1)',
     host: 'Student Leadership Body',

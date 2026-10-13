@@ -1,0 +1,15 @@
+# Merge these into your existing pubspec.yaml.
+# Use `flutter pub add <package>` if you prefer Flutter to resolve compatible versions.
+dependencies:
+  supabase_flutter: any
+  just_audio: any
+  just_audio_background: any
+  audio_service: any
+  shared_preferences: any
+  video_player: any
+  youtube_player_flutter: any
+  url_launcher: any
+
+flutter:
+  assets:
+    - assets/branding/
