@@ -1,0 +1,73 @@
+
+workflows:
+
+  android-debug:
+    name: "01 - Android APK Test"
+    instance_type: mac_mini_m2
+    max_build_duration: 45
+
+    environment:
+      flutter: stable
+
+    scripts:
+      - name: Configure Flutter
+        script: |
+          echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/android/local.properties"
+          flutter pub get
+
+      - name: Build debug APK
+        script: flutter build apk --debug
+
+    artifacts:
+      - build/app/outputs/flutter-apk/*.apk
+
+  shorebird-release:
+    name: "02 - Shorebird APK Release"
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+
+    environment:
+      flutter: stable
+      groups:
+        - shorebird
+
+    scripts:
+      - name: Configure Flutter
+        script: |
+          echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/android/local.properties"
+          flutter pub get
+
+      - name: Install Shorebird
+        script: |
+          curl --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh -sSf | bash
+          echo "PATH=$HOME/.shorebird/bin:$PATH" >> "$CM_ENV"
+
+      - name: Build Shorebird APK
+        script: shorebird release android --artifact apk
+
+    artifacts:
+      - build/**/outputs/**/*.apk
+      - build/**/outputs/**/*.aab
+
+  shorebird-staging-patch:
+    name: "03 - Shorebird Staging Patch"
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+
+    environment:
+      flutter: stable
+      groups:
+        - shorebird
+
+    scripts:
+      - name: Install dependencies
+        script: flutter pub get
+
+      - name: Install Shorebird
+        script: |
+          curl --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh -sSf | bash
+          echo "PATH=$HOME/.shorebird/bin:$PATH" >> "$CM_ENV"
+
+      - name: Upload staging patch
+        script: |
+          shorebird patch android --release-version latest --track=staging
